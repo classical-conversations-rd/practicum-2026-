@@ -218,6 +218,32 @@
   .bank li:last-child{border-bottom:0}
   .bank li span{color:var(--navy);font-weight:600;text-align:right}
   .bank li .acct{font-size:21px;letter-spacing:.02em;font-family:'Cormorant Garamond',serif;font-weight:700}
+  /* ---------- Unified pay component ---------- */
+  .pay{max-width:680px;margin:0 auto;background:var(--cream-card);border:1px solid var(--line);border-radius:10px;padding:30px 32px;box-shadow:var(--shadow-sm)}
+  .pay-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:#fff;border:1px solid var(--line);border-radius:7px;padding:6px;margin-bottom:26px}
+  .pm{display:flex;flex-direction:column;gap:2px;align-items:center;justify-content:center;padding:12px 10px;border:0;border-radius:5px;background:transparent;cursor:pointer;transition:.18s;font-family:inherit}
+  .pm .pm-t{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--navy);line-height:1}
+  .pm .pm-s{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .pm[aria-pressed="true"]{background:var(--navy)}
+  .pm[aria-pressed="true"] .pm-t{color:#fff}
+  .pm[aria-pressed="true"] .pm-s{color:#E9C19E}
+  .pay-items{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px}
+  .pi{background:#fff;border:1px solid var(--line-soft);border-radius:7px;padding:16px 12px 18px;text-align:center}
+  .pi-h{margin-bottom:12px;min-height:62px;display:flex;flex-direction:column;justify-content:center}
+  .pi-name{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--navy);font-weight:600;line-height:1.1}
+  .pi-price{font-size:14px;color:var(--orange-deep);font-weight:600;margin-top:3px}
+  .pi-sub{font-size:12px;color:var(--muted);margin-top:1px}
+  .pi .stepper{margin:0 auto}
+  .pay-total{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--navy);border-radius:8px;padding:16px 24px;color:#EADFCE;margin-bottom:20px}
+  .pt-label{font-size:17px;letter-spacing:.01em}
+  .pt-amounts{text-align:right}
+  .pt-amounts #ptMain{display:block;font-family:'Cormorant Garamond',serif;font-size:36px;color:#fff;font-weight:700;line-height:1}
+  .pt-alt{display:block;font-size:13px;color:#B9AC97;margin-top:5px}
+  .pay-panel .btn{width:100%}
+  .pay-bank{margin-bottom:18px}
+  .pb-row{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:center;margin-bottom:4px}
+  .pp-note{text-align:center;font-size:14px;color:var(--muted);margin-top:14px;line-height:1.5}
+  .pp-note strong{color:var(--navy)}
   /* ---------- Calculadora ---------- */
   .calc{max-width:620px;margin:34px auto 0;background:var(--cream-card);border:1px solid var(--line);border-radius:8px;padding:34px 34px 30px;box-shadow:var(--shadow-sm)}
   .calc-head{text-align:center;margin-bottom:22px}
@@ -296,6 +322,8 @@
     .sec{padding:70px 0}
     .hero-media{height:260px}
     .hero-meta li{font-size:20px}
+    .pay-items{grid-template-columns:1fr}
+    .pay{padding:24px 20px}
     .gallery{grid-template-columns:1fr}
     .tk-grid{grid-template-columns:1fr}
     .stats{grid-template-columns:1fr;gap:14px}
@@ -467,79 +495,84 @@
       <h2>Reserva tu lugar</h2>
     </div>
 
-    <p class="oneprice reveal"><strong>US$30 (RD$1,800) por persona.</strong> &nbsp;¿Vienes en familia? En el pago por transferencia puedes sumar niños (RD$700) y almuerzos (RD$780) con la calculadora.</p>
+    <p class="oneprice reveal">Una sola boleta: <strong>US$30 (RD$1,800) por persona.</strong> Elige c&oacute;mo pagar, suma ni&ntilde;os y almuerzos y obt&eacute;n tu total exacto.</p>
 
-    <div class="tk-grid reveal">
-      <!-- Pago en línea (Stripe) -->
-      <div class="tk feat">
-        <span class="ribbon">Más fácil</span>
-        <span class="kicker">Pago en línea</span>
-        <h3>Tarjeta</h3>
-        <div class="price">US$30 <small>/ persona</small></div>
-        <div class="ppl">Pago seguro con tarjeta vía Stripe</div>
-        <ul>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg> Acceso a la jornada completa (9:00 a.m. – 4:00 p.m.)</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg> Formación en el método clásico + materiales</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l4 4 10-10"/></svg> Pago inmediato y seguro con tarjeta</li>
-        </ul>
-        <!-- TODO: reemplazar href="#" por el Stripe Payment Link (US$30) -->
-        <a class="btn btn-primary" href="#" data-stripe="tarjeta" target="_blank" rel="noopener">Comprar mi boleta · US$30</a>
+    <div class="pay reveal" id="calc">
+      <div class="pay-toggle" role="group" aria-label="Forma de pago">
+        <button type="button" class="pm" data-method="card" aria-pressed="true">
+          <span class="pm-t">Pago en l&iacute;nea</span>
+          <span class="pm-s">Tarjeta &middot; US$</span>
+        </button>
+        <button type="button" class="pm" data-method="transfer" aria-pressed="false">
+          <span class="pm-t">Transferencia</span>
+          <span class="pm-s">Banco Popular &middot; RD$</span>
+        </button>
       </div>
 
-      <!-- Transferencia bancaria -->
-      <div class="tk">
-        <span class="kicker">Pago por transferencia</span>
-        <h3>Transferencia</h3>
-        <div class="price">RD$1,800 <small>/ persona</small></div>
-        <div class="ppl">Banco Popular · Cuenta de ahorros</div>
-        <ul class="bank">
-          <li>No. de cuenta <span class="acct">084-753-4500</span></li>
-          <li>Titular <span>Katerine Fernández</span></li>
-          <li>Cédula <span>001-1642619-8</span></li>
-        </ul>
-        <a class="btn btn-ghost" href="#calc">Calcular mi monto ↓</a>
-      </div>
-    </div>
-
-    <!-- Calculadora de transferencia -->
-    <div class="calc reveal" id="calc">
-      <div class="calc-head">
-        <span class="kicker" style="color:var(--orange-deep);font-size:13px;letter-spacing:.18em;text-transform:uppercase;font-weight:600">Pago por transferencia</span>
-        <h3>Calcula tu monto a transferir</h3>
-        <p>Indica cuántos asistirán y cuántos almuerzos. Te mostramos el total exacto a transferir a la cuenta Popular.</p>
-      </div>
-      <div class="calc-rows">
-        <div class="calc-item">
-          <div class="ci-label">Adultos <small>RD$1,800 c/u</small></div>
+      <div class="pay-items">
+        <div class="pi">
+          <div class="pi-h">
+            <span class="pi-name">Adultos</span>
+            <span class="pi-price" data-usd="US$30" data-dop="RD$1,800">US$30 c/u</span>
+          </div>
           <div class="stepper">
-            <button type="button" class="cstep" data-target="cAd" data-d="-1" aria-label="Menos adultos">−</button>
-            <input id="cAd" class="cnum" type="number" min="0" inputmode="numeric" value="2" data-price="1800" />
-            <button type="button" class="cstep" data-target="cAd" data-d="1" aria-label="Más adultos">+</button>
+            <button type="button" class="cstep" data-target="qAd" data-d="-1" aria-label="Menos adultos">&minus;</button>
+            <input id="qAd" class="cnum" type="number" min="0" inputmode="numeric" value="2" />
+            <button type="button" class="cstep" data-target="qAd" data-d="1" aria-label="M&aacute;s adultos">+</button>
           </div>
         </div>
-        <div class="calc-item">
-          <div class="ci-label">Niños <small>RD$700 c/u · área infantil</small></div>
+        <div class="pi">
+          <div class="pi-h">
+            <span class="pi-name">Ni&ntilde;os</span>
+            <span class="pi-price" data-usd="US$12" data-dop="RD$700">US$12 c/u</span>
+            <span class="pi-sub">&aacute;rea infantil</span>
+          </div>
           <div class="stepper">
-            <button type="button" class="cstep" data-target="cNi" data-d="-1" aria-label="Menos niños">−</button>
-            <input id="cNi" class="cnum" type="number" min="0" inputmode="numeric" value="0" data-price="700" />
-            <button type="button" class="cstep" data-target="cNi" data-d="1" aria-label="Más niños">+</button>
+            <button type="button" class="cstep" data-target="qNi" data-d="-1" aria-label="Menos ni&ntilde;os">&minus;</button>
+            <input id="qNi" class="cnum" type="number" min="0" inputmode="numeric" value="0" />
+            <button type="button" class="cstep" data-target="qNi" data-d="1" aria-label="M&aacute;s ni&ntilde;os">+</button>
           </div>
         </div>
-        <div class="calc-item">
-          <div class="ci-label">Almuerzos <small>RD$780 c/u · opcional</small></div>
+        <div class="pi">
+          <div class="pi-h">
+            <span class="pi-name">Almuerzo</span>
+            <span class="pi-price" data-usd="US$13" data-dop="RD$780">US$13 c/u</span>
+            <span class="pi-sub">opcional</span>
+          </div>
           <div class="stepper">
-            <button type="button" class="cstep" data-target="cCo" data-d="-1" aria-label="Menos almuerzos">−</button>
-            <input id="cCo" class="cnum" type="number" min="0" inputmode="numeric" value="0" data-price="780" />
-            <button type="button" class="cstep" data-target="cCo" data-d="1" aria-label="Más almuerzos">+</button>
+            <button type="button" class="cstep" data-target="qCo" data-d="-1" aria-label="Menos almuerzos">&minus;</button>
+            <input id="qCo" class="cnum" type="number" min="0" inputmode="numeric" value="0" />
+            <button type="button" class="cstep" data-target="qCo" data-d="1" aria-label="M&aacute;s almuerzos">+</button>
           </div>
         </div>
       </div>
-      <div class="calc-total">
-        <span>Total a transferir</span>
-        <strong id="cTotal">RD$3,600</strong>
+
+      <div class="pay-total">
+        <span class="pt-label">Total a pagar</span>
+        <div class="pt-amounts">
+          <strong id="ptMain">US$60</strong>
+          <span class="pt-alt" id="ptAlt">&asymp; RD$3,600 (referencia)</span>
+        </div>
       </div>
-      <a id="cWa" class="btn btn-primary" href="#" target="_blank" rel="noopener">Ya transferí · enviar comprobante por WhatsApp</a>
-      <p class="calc-note">Transfiere ese monto a la cuenta <strong>Banco Popular 084-753-4500</strong> (Katerine Fernández) y envía el comprobante para confirmar tu cupo.</p>
+
+      <div class="pay-panel" id="panelCard">
+        <!-- TODO: reemplazar href="#" por el Stripe Payment Link -->
+        <a id="ctaCard" class="btn btn-primary" href="#" data-stripe="general" target="_blank" rel="noopener">Comprar mi boleta &middot; US$60</a>
+        <p class="pp-note">Pago seguro con tarjeta v&iacute;a Stripe. Te pedir&aacute; nombre, correo y tel&eacute;fono; recibir&aacute;s la confirmaci&oacute;n por correo.</p>
+      </div>
+
+      <div class="pay-panel" id="panelTransfer" hidden>
+        <div class="pay-bank">
+          <div class="pb-row">Banco Popular &middot; Cuenta de ahorros</div>
+          <ul class="bank">
+            <li>No. de cuenta <span class="acct">084-753-4500</span></li>
+            <li>Titular <span>Katerine Fern&aacute;ndez</span></li>
+            <li>C&eacute;dula <span>001-1642619-8</span></li>
+          </ul>
+        </div>
+        <a id="ctaWa" class="btn btn-primary" href="#" target="_blank" rel="noopener">Ya transfer&iacute; &middot; enviar comprobante</a>
+        <p class="pp-note">Transfiere el <strong>Total a pagar</strong> a esa cuenta y env&iacute;a el comprobante por WhatsApp para confirmar tu cupo.</p>
+      </div>
     </div>
 
     <div class="tk-foot reveal">
@@ -656,34 +689,55 @@
     });
   });
 
-  // Calculadora de transferencia
+  // Calculadora / selector de pago
   (function(){
-    var ad=document.getElementById('cAd'),ni=document.getElementById('cNi'),co=document.getElementById('cCo');
-    var out=document.getElementById('cTotal'),wa=document.getElementById('cWa');
-    if(!ad) return;
-    var WA="https://wa.me/18492016825?text=";
-    function fmt(n){return "RD$"+n.toLocaleString('es-DO');}
-    function val(el){var v=parseInt(el.value,10);if(isNaN(v)||v<0)v=0;return v;}
-    function calc(){
-      var a=val(ad),n=val(ni),c=val(co);
-      var total=a*1800+n*700+c*780;
-      out.textContent=fmt(total);
-      var msg="Hola, quiero reservar para el Prácticum 2026.%0A"+
-        "Adultos: "+a+" (RD$"+(a*1800).toLocaleString('es-DO')+")%0A"+
-        "Niños: "+n+" (RD$"+(n*700).toLocaleString('es-DO')+")%0A"+
-        "Almuerzos: "+c+" (RD$"+(c*780).toLocaleString('es-DO')+")%0A"+
-        "Total a transferir: "+fmt(total)+"%0AAdjunto mi comprobante de transferencia.";
-      wa.setAttribute('href',WA+msg);
+    var P={qAd:{usd:30,dop:1800},qNi:{usd:12,dop:700},qCo:{usd:13,dop:780}};
+    var ids=["qAd","qNi","qCo"], el={};
+    ids.forEach(function(i){el[i]=document.getElementById(i);});
+    if(!el.qAd) return;
+    var ptMain=document.getElementById("ptMain"),ptAlt=document.getElementById("ptAlt");
+    var ctaCard=document.getElementById("ctaCard"),ctaWa=document.getElementById("ctaWa");
+    var panelCard=document.getElementById("panelCard"),panelTransfer=document.getElementById("panelTransfer");
+    var pms=document.querySelectorAll(".pm"), prices=document.querySelectorAll(".pi-price");
+    var WA="https://wa.me/18492016825?text=", method="card";
+    function vv(i){var n=parseInt(el[i].value,10);if(isNaN(n)||n<0)n=0;return n;}
+    function fUSD(n){return "US$"+n.toLocaleString("en-US");}
+    function fDOP(n){return "RD$"+n.toLocaleString("es-DO");}
+    function totals(){var u=0,d=0;ids.forEach(function(i){u+=vv(i)*P[i].usd;d+=vv(i)*P[i].dop;});return {u:u,d:d};}
+    function render(){
+      var t=totals();
+      prices.forEach(function(p){p.textContent=(method==="card"?p.getAttribute("data-usd"):p.getAttribute("data-dop"))+" c/u";});
+      if(method==="card"){
+        ptMain.textContent=fUSD(t.u);
+        ptAlt.textContent="\u2248 "+fDOP(t.d)+" (referencia)";
+        ctaCard.textContent="Comprar mi boleta \u00b7 "+fUSD(t.u);
+      } else {
+        ptMain.textContent=fDOP(t.d);
+        ptAlt.textContent="\u2248 "+fUSD(t.u)+" (referencia)";
+        var a=vv("qAd"),n=vv("qNi"),c=vv("qCo");
+        var msg="Hola, quiero reservar para el Pr\u00e1cticum 2026.%0A"+
+          "Adultos: "+a+"%0ANi\u00f1os: "+n+"%0AAlmuerzos: "+c+"%0A"+
+          "Total transferido: "+fDOP(t.d)+"%0AAdjunto mi comprobante.";
+        ctaWa.setAttribute("href",WA+msg);
+        ctaWa.textContent="Ya transfer\u00ed "+fDOP(t.d)+" \u00b7 enviar comprobante";
+      }
     }
-    [ad,ni,co].forEach(function(el){el.addEventListener('input',calc);});
-    document.querySelectorAll('.cstep').forEach(function(b){
-      b.addEventListener('click',function(){
-        var t=document.getElementById(b.getAttribute('data-target'));
-        var d=parseInt(b.getAttribute('data-d'),10);
-        var nv=val(t)+d; if(nv<0)nv=0; t.value=nv; calc();
+    function setMethod(m){
+      method=m;
+      pms.forEach(function(b){var on=b.getAttribute("data-method")===m;b.setAttribute("aria-pressed",on?"true":"false");});
+      panelCard.hidden=(m!=="card"); panelTransfer.hidden=(m!=="transfer");
+      render();
+    }
+    pms.forEach(function(b){b.addEventListener("click",function(){setMethod(b.getAttribute("data-method"));});});
+    ids.forEach(function(i){el[i].addEventListener("input",render);});
+    document.querySelectorAll(".cstep").forEach(function(b){
+      b.addEventListener("click",function(){
+        var t=document.getElementById(b.getAttribute("data-target"));
+        var dd=parseInt(b.getAttribute("data-d"),10);
+        var nv=(parseInt(t.value,10)||0)+dd; if(nv<0)nv=0; t.value=nv; render();
       });
     });
-    calc();
+    setMethod("card");
   })();
 </script>
 </body>
