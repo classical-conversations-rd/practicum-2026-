@@ -686,16 +686,6 @@
   var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
   document.querySelectorAll('.reveal').forEach(function(el){io.observe(el)});
 
-  // Guard: avisar si los links de Stripe siguen en placeholder
-  document.querySelectorAll('a[data-stripe]').forEach(function(a){
-    a.addEventListener('click',function(e){
-      if(a.getAttribute('href')==='#'){
-        e.preventDefault();
-        alert('Este botón aún no tiene el link de Stripe.\n\nReemplaza href="#" por tu Stripe Payment Link de la boleta "'+a.getAttribute('data-stripe')+'".');
-      }
-    });
-  });
-
   // Calculadora / selector de pago
   (function(){
     var P={qAd:{usd:30,dop:1800},qNi:{usd:12,dop:700},qCo:{usd:13,dop:780}};
@@ -744,6 +734,15 @@
         var nv=(parseInt(t.value,10)||0)+dd; if(nv<0)nv=0; t.value=nv; render();
       });
     });
+    function resetCta(){ ctaCard.style.pointerEvents=""; render(); }
+    function irAPagar(q){
+      ctaCard.textContent="Redirigiendo\u2026"; ctaCard.style.pointerEvents="none";
+      fetch("/.netlify/functions/create-checkout-session",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(q)})
+        .then(function(r){return r.json();})
+        .then(function(d){ if(d&&d.url){window.location.href=d.url;} else {alert((d&&d.error)||"No se pudo iniciar el pago."); resetCta();} })
+        .catch(function(){ alert("No se pudo iniciar el pago. Intenta de nuevo."); resetCta(); });
+    }
+    ctaCard.addEventListener("click",function(e){ e.preventDefault(); irAPagar({adults:vv("qAd"),kids:vv("qNi"),lunch:vv("qCo")}); });
     setMethod("card");
   })();
 </script>
