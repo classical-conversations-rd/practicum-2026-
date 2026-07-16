@@ -180,6 +180,41 @@
   .hcard h3{font-size:24px;margin-bottom:10px}
   .hcard p{font-size:17px;color:var(--muted);line-height:1.55}
 
+  /* ---------- Programa ---------- */
+  .program{background:var(--navy);color:#EADFCD}
+  .program h2{color:#fff}
+  .program .sec-head p{color:#C9BBA6}
+  .program .eyebrow{color:#E9B894}
+  .program .ornament{color:var(--orange)}
+  .ag-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+  .ag-col{background:var(--cream-card);border-radius:6px;overflow:hidden;box-shadow:var(--shadow);min-width:0}
+  .ag-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;background:var(--navy-deep);padding:16px 26px;border-bottom:2px solid var(--orange)}
+  .ag-head .t{display:flex;align-items:center;gap:11px;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#fff;letter-spacing:.14em;text-transform:uppercase}
+  .ag-head .t svg{color:var(--orange);flex:none}
+  .ag-head .rng{font-size:14.5px;color:#D7C9B4;letter-spacing:.03em}
+  .ag-item{display:flex;gap:20px;padding:17px 26px;border-bottom:1px solid var(--line-soft)}
+  .ag-item:last-child{border-bottom:0}
+  .ag-time{flex:none;width:106px;font-family:'Cormorant Garamond',serif;font-size:18.5px;font-weight:700;color:var(--navy);line-height:1.25}
+  .ag-time small{display:block;font-family:'EB Garamond',serif;font-size:12.5px;color:var(--orange-deep);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+  .ag-body{min-width:0}
+  .ag-body h4{font-size:20px;color:var(--navy);margin-bottom:4px}
+  .ag-body p{font-size:15.5px;color:var(--muted);line-height:1.55}
+  .ag-break{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;background:var(--navy);color:#EADFCE;padding:11px 26px;font-size:15px;letter-spacing:.05em}
+  .ag-break svg{color:var(--orange);flex:none}
+  .ag-break strong{color:#fff;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+  .ag-break.soft{background:#EAE3D2;color:var(--navy-soft)}
+  .ag-break.soft svg{color:var(--orange-deep)}
+  .ag-quote{text-align:center;margin-top:46px}
+  .ag-quote p{font-family:'Cormorant Garamond',serif;font-size:25px;font-style:italic;color:#F0E6D7}
+  .ag-quote span{display:block;margin-top:9px;font-size:13.5px;letter-spacing:.22em;text-transform:uppercase;color:#C9BBA6}
+  @media(max-width:980px){.ag-grid{grid-template-columns:1fr}}
+  @media(max-width:760px){
+    .ag-item{padding:15px 18px;gap:14px}
+    .ag-time{width:90px;font-size:17px}
+    .ag-head{padding:13px 18px}
+    .ag-break{padding:10px 18px}
+  }
+
   /* ---------- Speaker ---------- */
   .speaker{background:var(--paper)}
   .sp-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:64px;align-items:center}
@@ -469,6 +504,171 @@
   </div>
 </section>
 
+<!-- ============ PROGRAMA ============ -->
+<section class="sec program" id="programa">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="ornament"><span class="ln"></span><span class="dot"></span><span class="ln r"></span></div>
+      <span class="eyebrow" style="display:block;margin-top:18px">El programa</span>
+      <h2>Atendiendo a lo Esencial: El Arte de la Gramática</h2>
+      <p>Agenda del Prácticum para Padres 2026 — un día completo, de 9:00 a.m. a 4:00 p.m.</p>
+    </div>
+    <div class="ag-grid reveal">
+
+      <!-- Mañana -->
+      <div class="ag-col">
+        <div class="ag-head">
+          <span class="t">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>
+            Mañana
+          </span>
+          <span class="rng">9:00 a.m. – 12:00 p.m.</span>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">9:00 – 9:30<small>30 min</small></div>
+          <div class="ag-body">
+            <h4>Bienvenida e Introducción</h4>
+            <p>Bienvenida · Devocional · Himno «Cuán Grande es Él» · Lectura bíblica · Himno «Sublime Gracia» · Presentación de las familias</p>
+          </div>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">9:30 – 10:05<small>35 min</small></div>
+          <div class="ag-body">
+            <h4>Atendiendo a lo Esencial</h4>
+            <p>Conocer a Dios y darlo a conocer · ¿Qué implica atender? · ¿Qué significa «esencial»? · ¿Qué es esencial para tu familia? · Los tres elementos esenciales de Classical Conversations</p>
+          </div>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">10:05 – 10:10<small>5 min</small></div>
+          <div class="ag-body">
+            <h4>Recurso destacado #1</h4>
+            <p>Recurso recomendado · Pausa para estirarse</p>
+          </div>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">10:10 – 10:25<small>15 min</small></div>
+          <div class="ag-body">
+            <h4>Educación Clásica</h4>
+            <p>Aprendizaje en capas · Integración del conocimiento · 5 Hábitos Básicos · 5 Tópicos Comunes · 5 Cánones de la Retórica</p>
+          </div>
+        </div>
+        <div class="ag-break">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M17 8h1a3 3 0 010 6h-1M3 8h14v6a5 5 0 01-5 5H8a5 5 0 01-5-5V8z"/><path d="M7 2v2M11 2v2M15 2v2"/></svg>
+          <strong>Receso</strong>&nbsp;· 10:25 – 10:40 a.m. · 15 min
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">10:40 – 10:50<small>10 min</small></div>
+          <div class="ag-body">
+            <h4>Educación Clásica (continuación)</h4>
+            <p>Tabla de objetivos · Reflexión · Recursos recomendados</p>
+          </div>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">10:50 – 11:15<small>25 min</small></div>
+          <div class="ag-body">
+            <h4>Sesión 1 · ¿Por qué la gramática?</h4>
+            <p>La importancia de la gramática para cristianos, familias, estudiantes y ciudadanía · Categorías gramaticales · Actividad práctica</p>
+          </div>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">11:15 – 11:40<small>25 min</small></div>
+          <div class="ag-body">
+            <h4>Sesión 2 · Las oraciones</h4>
+            <p>Propósitos de las oraciones · Análisis de Juan 14 · Reflexión sobre el estudio de la gramática</p>
+          </div>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">11:40 – 12:00<small>20 min</small></div>
+          <div class="ag-body">
+            <h4>Cierre de la mañana</h4>
+            <p>Síntesis · Himno · Anuncios</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarde -->
+      <div class="ag-col">
+        <div class="ag-head">
+          <span class="t">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M11 20A7 7 0 019.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+            Tarde
+          </span>
+          <span class="rng">1:00 – 4:00 p.m.</span>
+        </div>
+        <div class="ag-break">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2M7 2v20M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+          <strong>Almuerzo</strong>&nbsp;· 12:00 – 1:00 p.m. · 60 min
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">1:00 – 1:30<small>30 min</small></div>
+          <div class="ag-body">
+            <h4>Sesión 3 · Estructura de las oraciones</h4>
+            <p>Figuras retóricas · ¿Por qué importa la estructura? · Oración simple, compuesta y compleja</p>
+          </div>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">1:30 – 1:35<small>5 min</small></div>
+          <div class="ag-body">
+            <h4>Recurso destacado #2</h4>
+            <p>Recurso recomendado</p>
+          </div>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">1:35 – 1:55<small>20 min</small></div>
+          <div class="ag-body">
+            <h4>Sesión 4 · Patrones de las oraciones</h4>
+            <p>Los siete patrones · Diagramación · Aplicación práctica</p>
+          </div>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">1:55 – 2:20<small>25 min</small></div>
+          <div class="ag-body">
+            <h4>Sesión 5 · Aplicando la gramática</h4>
+            <p>¿Por qué estudiar gramática? · Considera esto… · Reflexión personal</p>
+          </div>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">2:20 – 2:25<small>5 min</small></div>
+          <div class="ag-body">
+            <h4>Recurso destacado #3</h4>
+            <p>Recursos y próximos pasos</p>
+          </div>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">2:25 – 2:40<small>15 min</small></div>
+          <div class="ag-body">
+            <h4>Resumen del día</h4>
+            <p>Principios esenciales · Herramientas del aprendizaje · Compromisos para el hogar</p>
+          </div>
+        </div>
+        <div class="ag-break">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M17 8h1a3 3 0 010 6h-1M3 8h14v6a5 5 0 01-5 5H8a5 5 0 01-5-5V8z"/><path d="M7 2v2M11 2v2M15 2v2"/></svg>
+          <strong>Receso</strong>&nbsp;· 2:40 – 2:55 p.m. · 15 min
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">2:55 – 3:40<small>30–45 min</small></div>
+          <div class="ag-body">
+            <h4>Panel comunitario</h4>
+            <p>Testimonios · Preguntas y respuestas · Comunidad Classical Conversations</p>
+          </div>
+        </div>
+        <div class="ag-item">
+          <div class="ag-time">3:40 – 4:00<small>20 min</small></div>
+          <div class="ag-body">
+            <h4>Conclusión</h4>
+            <p>Reflexión final · Presentación del liderazgo local · Próximos eventos · Encuesta · Bendición · Himno de cierre</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="ag-quote reveal">
+      <p>«Conocer a Dios y darlo a conocer.»</p>
+      <span>Deuteronomio 6:4-7</span>
+    </div>
+  </div>
+</section>
+
 <!-- ============ SPEAKER ============ -->
 <section class="sec speaker" id="entrenadora">
   <div class="wrap">
@@ -665,6 +865,7 @@
       <div class="foot-col">
         <h4>El evento</h4>
         <a href="#practicum">El Prácticum</a>
+        <a href="#programa">El Programa</a>
         <a href="#entrenadora">La Entrenadora</a>
         <a href="#boletas">Boletas</a>
         <a href="#detalles">Detalles</a>
