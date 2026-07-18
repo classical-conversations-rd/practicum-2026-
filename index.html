@@ -982,7 +982,7 @@
         .then(function(d){ if(d&&d.url){window.location.href=d.url;} else {alert((d&&d.error)||"No se pudo iniciar el pago."); resetCta();} })
         .catch(function(){ alert("No se pudo iniciar el pago. Intenta de nuevo."); resetCta(); });
     }
-    ctaCard.addEventListener("click",function(e){ e.preventDefault(); irAPagar({adults:vv("qAd"),kids:vv("qNi"),lunch:vv("qCo")}); });
+    ctaCard.addEventListener("click",function(e){ e.preventDefault(); var promo=(new URLSearchParams(location.search).get("promo")||"").trim(); irAPagar({adults:vv("qAd"),kids:vv("qNi"),lunch:vv("qCo"),promo:promo}); });
     setMethod("card");
   })();
 </script>
