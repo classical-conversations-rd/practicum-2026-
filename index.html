@@ -937,18 +937,39 @@
     var panelCard=document.getElementById("panelCard"),panelTransfer=document.getElementById("panelTransfer");
     var pms=document.querySelectorAll(".pm"), prices=document.querySelectorAll(".pi-price");
     var WA="https://wa.me/18492016825?text=", method="card";
+    // Descuento familias CC: se activa solo si la URL trae ?promo=CCRD2026.
+    // Refleja en pantalla el mismo descuento que Stripe aplica (28% en adultos).
+    var PROMO={code:"CCRD2026",pct:0.28,item:"qAd",label:"Descuento familias CC"};
+    var activePromo=(function(){var p=(new URLSearchParams(location.search).get("promo")||"").trim();return p.toUpperCase()===PROMO.code?PROMO:null;})();
+    var promoNote=document.createElement("div");
+    promoNote.id="promoNote";
+    promoNote.style.cssText="display:none;margin:2px 0 0;font-weight:700;color:var(--orange-deep,#C4571F)";
+    var calcBox=document.getElementById("calc");
+    if(calcBox&&panelCard)calcBox.insertBefore(promoNote,panelCard);
     function vv(i){var n=parseInt(el[i].value,10);if(isNaN(n)||n<0)n=0;return n;}
-    function fUSD(n){return "US$"+n.toLocaleString("en-US");}
+    function fUSD(n){var r=Math.round(n*100)/100;var s=(r%1===0)?r.toLocaleString("en-US"):r.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});return "US$"+s;}
     function fDOP(n){return "RD$"+n.toLocaleString("es-DO");}
     function totals(){var u=0,d=0;ids.forEach(function(i){u+=vv(i)*P[i].usd;d+=vv(i)*P[i].dop;});return {u:u,d:d};}
+    function discount(){if(!activePromo)return {u:0,d:0};var q=vv(activePromo.item);return {u:q*P[activePromo.item].usd*activePromo.pct,d:q*P[activePromo.item].dop*activePromo.pct};}
     function render(){
       var t=totals();
       prices.forEach(function(p){p.textContent=(method==="card"?p.getAttribute("data-usd"):p.getAttribute("data-dop"))+" c/u";});
       if(method==="card"){
-        ptMain.textContent=fUSD(t.u);
-        ptAlt.textContent="\u2248 "+fDOP(t.d)+" (referencia)";
-        ctaCard.textContent="Comprar mi boleta \u00b7 "+fUSD(t.u);
+        var disc=discount();
+        if(activePromo&&disc.u>0){
+          ptMain.innerHTML='<span style="text-decoration:line-through;opacity:.45;font-weight:600;font-size:.55em;margin-right:.4em">'+fUSD(t.u)+'</span>'+fUSD(t.u-disc.u);
+          promoNote.style.display="";
+          promoNote.textContent="\u2713 "+activePromo.label+" ("+Math.round(activePromo.pct*100)+"% en adultos) \u00b7 \u2212"+fUSD(disc.u);
+          ptAlt.textContent="\u2248 "+fDOP(t.d-disc.d)+" (referencia)";
+          ctaCard.textContent="Comprar mi boleta \u00b7 "+fUSD(t.u-disc.u);
+        } else {
+          ptMain.textContent=fUSD(t.u);
+          promoNote.style.display="none";
+          ptAlt.textContent="\u2248 "+fDOP(t.d)+" (referencia)";
+          ctaCard.textContent="Comprar mi boleta \u00b7 "+fUSD(t.u);
+        }
       } else {
+        promoNote.style.display="none";
         ptMain.textContent=fDOP(t.d);
         ptAlt.textContent="\u2248 "+fUSD(t.u)+" (referencia)";
         var a=vv("qAd"),n=vv("qNi"),c=vv("qCo");
