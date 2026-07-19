@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Área Infantil · Prácticum 2026</title>
+<meta name="description" content="Panel de voluntarios del Área Infantil — registro, cuidado y entrega segura de los niños durante el Prácticum 2026." />
+<meta name="robots" content="noindex, nofollow" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<meta name="theme-color" content="#0F2142" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet" />
+
+<style>
+  :root{
+    --navy:#0F2142;
+    --navy-deep:#0A1832;
+    --navy-soft:#1B3157;
+    --orange:#E8743A;
+    --orange-deep:#CE5C26;
+    --cream:#F6EEE3;
+    --cream-card:#FBF7F0;
+    --paper:#FCF9F4;
+    --ink:#26272B;
+    --muted:#5C5E64;
+    --green:#2E7D4F;
+    --red:#B3401F;
+    --line:rgba(15,33,66,.16);
+    --line-soft:rgba(15,33,66,.10);
+    --shadow:0 22px 60px -28px rgba(10,24,50,.45);
+    --shadow-sm:0 10px 30px -18px rgba(10,24,50,.40);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:'EB Garamond',Georgia,serif;
+    color:var(--ink);
+    background:var(--cream);
+    font-size:18px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;line-height:1.1;color:var(--navy)}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  .eyebrow{font-family:'EB Garamond',serif;text-transform:uppercase;letter-spacing:.28em;font-size:12.5px;font-weight:600;color:var(--orange-deep)}
+  .eyebrow.light{color:#E9B894}
+  .ornament{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 auto;color:var(--orange)}
+  .ornament .ln{height:1px;width:52px;background:linear-gradient(90deg,transparent,currentColor)}
+  .ornament .ln.r{background:linear-gradient(270deg,transparent,currentColor)}
+  .ornament .dot{width:7px;height:7px;transform:rotate(45deg);border:1px solid currentColor}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    font-family:'EB Garamond',serif;font-size:16.5px;font-weight:600;letter-spacing:.02em;
+    padding:12px 24px;border-radius:2px;cursor:pointer;transition:.22s;border:1px solid transparent;
+  }
+  .btn-primary{background:var(--orange);color:#fff}
+  .btn-primary:hover{background:var(--orange-deep);transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:var(--navy);border-color:var(--navy)}
+  .btn-ghost:hover{background:var(--navy);color:#fff}
+  .btn-danger{background:transparent;color:var(--red);border-color:var(--red)}
+  .btn-danger:hover{background:var(--red);color:#fff}
+  .btn-sm{padding:8px 16px;font-size:15px}
+  .btn[disabled]{opacity:.5;pointer-events:none}
+
+  /* ---------- Login ---------- */
+  .login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--navy-deep);padding:30px 20px}
+  .login-card{width:100%;max-width:440px;text-align:center}
+  .login-card .logo{width:180px;margin:0 auto 26px}
+  .login-card h1{color:#fff;font-size:38px;margin:14px 0 6px}
+  .login-card .sub{color:#C9BBA6;font-size:17px;margin-bottom:30px;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:19px}
+  .login-box{background:var(--cream-card);border-radius:8px;padding:30px 28px;box-shadow:var(--shadow);text-align:left}
+  .login-box .btn{width:100%;margin-top:6px}
+  .login-err{display:none;background:rgba(179,64,31,.1);border:1px solid rgba(179,64,31,.35);color:var(--red);border-radius:4px;padding:10px 14px;font-size:15px;margin-bottom:14px}
+  .login-note{margin-top:22px;color:#8B7E6A;font-size:14px}
+
+  /* ---------- Form fields ---------- */
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:var(--muted);margin-bottom:6px}
+  .field input[type=text],.field input[type=tel],.field input[type=password],.field input[type=number],.field select,.field textarea{
+    width:100%;border:1px solid var(--line);border-radius:4px;background:#fff;
+    font-family:'EB Garamond',serif;font-size:18px;color:var(--ink);padding:11px 14px;outline:none;transition:.15s;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(15,33,66,.08)}
+  .field .hint{font-size:13.5px;color:var(--muted);margin-top:4px}
+
+  /* ---------- App shell ---------- */
+  .app{display:none}
+  .topbar{background:var(--navy-deep);color:#F4ECE0;padding:14px 0}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .topbar .brand{display:flex;align-items:center;gap:14px}
+  .topbar .brand img{width:120px}
+  .topbar .brand .t{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:#fff;border-left:1px solid rgba(244,236,224,.3);padding-left:14px;line-height:1.15}
+  .topbar .who{display:flex;align-items:center;gap:12px;font-size:15px;color:#D7C9B4}
+  .topbar .who strong{color:#fff;font-weight:600}
+  .topbar .who button{background:none;border:1px solid rgba(244,236,224,.35);color:#EADFCE;border-radius:3px;padding:5px 12px;font-family:inherit;font-size:13.5px;cursor:pointer;transition:.2s}
+  .topbar .who button:hover{background:var(--orange);border-color:var(--orange);color:#fff}
+
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0 8px}
+  .stat{text-align:center;padding:18px 10px;background:var(--cream-card);border:1px solid var(--line-soft);border-radius:4px}
+  .stat .n{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:38px;color:var(--navy);line-height:1}
+  .stat .n.g{color:var(--green)}
+  .stat .l{font-size:13.5px;color:var(--muted);margin-top:5px;letter-spacing:.04em;text-transform:uppercase;font-weight:600}
+
+  .tabs{display:flex;gap:8px;margin:22px 0 26px;border-bottom:2px solid var(--line-soft);flex-wrap:wrap}
+  .tab{
+    background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;
+    font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;color:var(--muted);
+    padding:10px 18px;cursor:pointer;transition:.18s;display:inline-flex;align-items:center;gap:8px;
+  }
+  .tab:hover{color:var(--navy)}
+  .tab.on{color:var(--navy);border-bottom-color:var(--orange)}
+  .tab .badge{background:var(--orange);color:#fff;font-family:'EB Garamond',serif;font-size:12.5px;font-weight:600;border-radius:20px;padding:2px 9px;line-height:1.4}
+
+  .panel{display:none;padding-bottom:80px}
+  .panel.on{display:block}
+
+  /* ---------- Card ---------- */
+  .card{background:var(--cream-card);border:1px solid var(--line);border-radius:8px;padding:28px;box-shadow:var(--shadow-sm);margin-bottom:22px}
+  .card h3{font-size:26px;margin-bottom:4px}
+  .card .sub{color:var(--muted);font-size:16px;margin-bottom:20px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+
+  /* ---------- Children rows in form ---------- */
+  .child-rows{display:flex;flex-direction:column;gap:12px;margin-bottom:14px}
+  .child-row{background:#fff;border:1px solid var(--line-soft);border-radius:6px;padding:16px;position:relative}
+  .child-row .grid-child{display:grid;grid-template-columns:1.4fr .5fr 1.6fr auto;gap:12px;align-items:end}
+  .child-row .rm{background:none;border:0;color:var(--red);cursor:pointer;font-size:20px;line-height:1;padding:10px 6px;font-family:inherit}
+  .child-row .rm:hover{opacity:.7}
+  .addchild{background:none;border:1px dashed var(--line);border-radius:6px;width:100%;padding:11px;font-family:'EB Garamond',serif;font-size:16px;font-weight:600;color:var(--navy);cursor:pointer;transition:.15s}
+  .addchild:hover{border-color:var(--orange);color:var(--orange-deep)}
+
+  /* ---------- Roster list ---------- */
+  .searchbar{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .searchbar input{flex:1;min-width:220px;border:1px solid var(--line);border-radius:4px;background:#fff;font-family:'EB Garamond',serif;font-size:17px;padding:11px 14px;outline:none}
+  .searchbar input:focus{border-color:var(--navy)}
+  .list{display:flex;flex-direction:column;gap:10px}
+  .row{
+    display:flex;align-items:center;gap:16px;background:var(--cream-card);
+    border:1px solid var(--line-soft);border-radius:6px;padding:14px 18px;
+  }
+  .row .avatar{
+    flex:none;width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Cormorant Garamond',serif;font-weight:700;font-size:19px;
+  }
+  .row.out .avatar{background:#A9A192}
+  .row .info{flex:1;min-width:0}
+  .row .nm{font-family:'Cormorant Garamond',serif;font-size:21px;font-weight:600;color:var(--navy);line-height:1.15}
+  .row .meta{font-size:14.5px;color:var(--muted);margin-top:2px}
+  .row .meta strong{color:var(--navy)}
+  .chip{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:3px;padding:2px 8px;margin-left:8px;vertical-align:1px}
+  .chip.alergia{background:rgba(179,64,31,.12);color:var(--red);border:1px solid rgba(179,64,31,.3)}
+  .chip.code{background:var(--navy);color:#fff;letter-spacing:.1em}
+  .chip.ok{background:rgba(46,125,79,.12);color:var(--green);border:1px solid rgba(46,125,79,.3)}
+  .empty{text-align:center;color:var(--muted);padding:46px 20px;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:21px}
+
+  /* ---------- Log ---------- */
+  .log-item{display:flex;gap:14px;padding:13px 4px;border-bottom:1px solid var(--line-soft);font-size:16px}
+  .log-item:last-child{border-bottom:0}
+  .log-item .tm{flex:none;width:76px;font-family:'Cormorant Garamond',serif;font-weight:700;color:var(--navy);font-size:17px}
+  .log-item .tx{color:#3a3b40}
+  .log-item .tx small{display:block;color:var(--muted);font-size:14px}
+  .lg-in{color:var(--green);font-weight:600}
+  .lg-out{color:var(--orange-deep);font-weight:600}
+
+  /* ---------- Modal ---------- */
+  .overlay{
+    display:none;position:fixed;inset:0;background:rgba(10,24,50,.55);z-index:100;
+    align-items:flex-start;justify-content:center;padding:30px 16px;overflow-y:auto;
+  }
+  .overlay.on{display:flex}
+  .modal{background:var(--paper);border-radius:10px;box-shadow:var(--shadow);width:100%;max-width:560px;padding:34px 32px;position:relative;margin:auto}
+  .modal .x{position:absolute;top:14px;right:16px;background:none;border:0;font-size:26px;color:var(--muted);cursor:pointer;line-height:1;font-family:inherit}
+  .modal .x:hover{color:var(--red)}
+  .modal h3{font-size:28px;margin-bottom:4px}
+  .modal .sub{color:var(--muted);font-size:16px;margin-bottom:20px}
+
+  /* ---------- Ticket ---------- */
+  .ticket{border:2px solid var(--navy);border-radius:10px;overflow:hidden;background:#fff;margin-bottom:20px}
+  .ticket-head{background:var(--navy-deep);color:#F4ECE0;text-align:center;padding:18px 20px 16px}
+  .ticket-head img{width:130px;margin:0 auto 8px}
+  .ticket-head .tt{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:#fff;letter-spacing:.06em}
+  .ticket-head .ts{font-size:13px;color:#C9BBA6;letter-spacing:.14em;text-transform:uppercase;margin-top:3px}
+  .ticket-code{text-align:center;padding:22px 20px 8px}
+  .ticket-code .lbl{font-size:12.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .ticket-code .code{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:700;color:var(--navy);line-height:1;letter-spacing:.06em;margin-top:6px}
+  .ticket-code .code span{color:var(--orange-deep)}
+  .ticket-kids{padding:6px 26px 4px;border-top:1px dashed var(--line);margin-top:14px}
+  .ticket-kids li{list-style:none;display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line-soft);font-size:17px}
+  .ticket-kids li:last-child{border-bottom:0}
+  .ticket-kids .kn{font-weight:600;color:var(--navy)}
+  .ticket-kids .ka{color:var(--muted);font-size:15px}
+  .ticket-foot{background:var(--cream);padding:14px 24px 16px;text-align:center;font-size:14.5px;color:var(--muted);line-height:1.5}
+  .ticket-foot strong{color:var(--navy)}
+  .modal-actions{display:flex;gap:12px;flex-wrap:wrap}
+  .modal-actions .btn{flex:1}
+
+  /* ---------- PIN verify ---------- */
+  .pin-box{display:flex;gap:12px;align-items:center;margin-bottom:8px}
+  .pin-box input{
+    flex:1;border:2px solid var(--line);border-radius:6px;background:#fff;text-align:center;
+    font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;letter-spacing:.35em;color:var(--navy);
+    padding:8px 12px;outline:none;width:100%;
+  }
+  .pin-box input:focus{border-color:var(--navy)}
+  .pin-ok{display:none;color:var(--green);font-weight:600;font-size:16px;margin-bottom:12px}
+  .pin-bad{display:none;color:var(--red);font-weight:600;font-size:16px;margin-bottom:12px}
+  .alt-verify{margin-top:18px;border-top:1px dashed var(--line);padding-top:16px}
+  .alt-verify summary{cursor:pointer;color:var(--orange-deep);font-weight:600;font-size:15.5px}
+  .alt-verify .warn{background:rgba(232,116,58,.1);border:1px solid rgba(232,116,58,.35);border-radius:5px;padding:12px 14px;font-size:14.5px;color:#7A4A22;margin:12px 0}
+
+  .fam-summary{background:#fff;border:1px solid var(--line-soft);border-radius:6px;padding:16px 18px;margin-bottom:18px;font-size:16px}
+  .fam-summary .fn{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--navy)}
+  .fam-summary p{color:var(--muted);margin-top:3px}
+  .fam-summary p strong{color:var(--navy)}
+
+  /* ---------- Emergency print list ---------- */
+  .print-only{display:none}
+
+  @media(max-width:760px){
+    .grid2{grid-template-columns:1fr}
+    .child-row .grid-child{grid-template-columns:1fr .6fr;grid-template-rows:auto auto;align-items:end}
+    .child-row .grid-child .span2{grid-column:1/-1}
+    .stats-row{gap:8px}
+    .stat .n{font-size:30px}
+    .stat .l{font-size:11.5px}
+    .topbar .brand .t{display:none}
+    .modal{padding:26px 20px}
+    .ticket-code .code{font-size:48px}
+  }
+
+  @media print{
+    body{background:#fff}
+    .topbar,.tabs,.stats-row,.searchbar,.panel,.login,.modal-actions,.modal .x,.no-print{display:none !important}
+    .overlay.on{position:static;background:none;padding:0;display:block}
+    .overlay.on .modal{box-shadow:none;max-width:100%;padding:0}
+    .print-only.on{display:block}
+    .print-table{width:100%;border-collapse:collapse;font-size:14px}
+    .print-table th,.print-table td{border:1px solid #999;padding:6px 8px;text-align:left}
+    .print-table th{background:#eee}
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<section class="login" id="viewLogin">
+  <div class="login-card">
+    <img class="logo" src="cc-logo-white.svg" alt="Classical Conversations" />
+    <span class="eyebrow light">Prácticum 2026 · Área Infantil</span>
+    <h1>Panel de voluntarios</h1>
+    <p class="sub">Registro, cuidado y entrega segura de los niños.</p>
+    <div class="login-box">
+      <div class="login-err" id="loginErr">Contraseña incorrecta. Inténtalo de nuevo.</div>
+      <div class="field">
+        <label for="volName">Tu nombre (voluntario/a)</label>
+        <input type="text" id="volName" autocomplete="name" placeholder="Ej.: María Pérez" />
+        <div class="hint">Quedará registrado en cada recepción y entrega que realices.</div>
+      </div>
+      <div class="field">
+        <label for="volPass">Contraseña del equipo</label>
+        <input type="password" id="volPass" autocomplete="current-password" placeholder="••••••••" />
+      </div>
+      <button class="btn btn-primary" id="btnLogin">Entrar al panel</button>
+      <p class="login-note" style="text-align:center">Acceso exclusivo para el equipo del Área Infantil.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ APP ============ -->
+<div class="app" id="viewApp">
+
+  <div class="topbar">
+    <div class="wrap">
+      <div class="brand">
+        <img src="cc-logo-white.svg" alt="Classical Conversations" />
+        <span class="t">Área Infantil<br/>Prácticum 2026</span>
+      </div>
+      <div class="who">
+        <span id="syncState" style="font-size:13px"></span>
+        <span>Voluntario/a: <strong id="whoName">—</strong></span>
+        <button id="btnLogout" type="button">Salir</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="stats-row">
+      <div class="stat"><div class="n g" id="stPresent">0</div><div class="l">Presentes ahora</div></div>
+      <div class="stat"><div class="n" id="stTotal">0</div><div class="l">Niños registrados</div></div>
+      <div class="stat"><div class="n" id="stOut">0</div><div class="l">Entregados</div></div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab on" data-panel="pReceive" role="tab">Recibir niños</button>
+      <button class="tab" data-panel="pRoster" role="tab">Presentes <span class="badge" id="tabBadge">0</span></button>
+      <button class="tab" data-panel="pLog" role="tab">Historial</button>
+    </div>
+
+    <!-- ===== Panel: Recibir ===== -->
+    <section class="panel on" id="pReceive" role="tabpanel">
+      <div class="card">
+        <h3>Registrar familia y recibir niños</h3>
+        <p class="sub">Completa los datos del padre/madre, agrega a cada niño y genera el ticket de recogida.</p>
+
+        <div class="grid2">
+          <div class="field">
+            <label for="fParent">Nombre del padre / madre / tutor</label>
+            <input type="text" id="fParent" placeholder="Ej.: Ana Rodríguez" />
+          </div>
+          <div class="field">
+            <label for="fPhone">Teléfono (WhatsApp)</label>
+            <input type="tel" id="fPhone" inputmode="tel" placeholder="Ej.: 809 555 1234" />
+            <div class="hint">Para avisarle durante el evento si es necesario.</div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="fAuth">Otras personas autorizadas a recoger (opcional)</label>
+          <input type="text" id="fAuth" placeholder="Ej.: Pedro Rodríguez (papá), Carmen Gómez (abuela)" />
+        </div>
+
+        <div class="field" style="margin-bottom:8px"><label>Niños</label></div>
+        <div class="child-rows" id="childRows"></div>
+        <button class="addchild" id="btnAddChild" type="button">+ Agregar otro niño</button>
+
+        <div style="margin-top:22px;display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-primary" id="btnCheckin" type="button" style="flex:1">Recibir y generar ticket</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Panel: Presentes ===== -->
+    <section class="panel" id="pRoster" role="tabpanel">
+      <div class="searchbar">
+        <input type="text" id="rosterSearch" placeholder="Buscar por niño, familia o código…" />
+        <button class="btn btn-ghost btn-sm" id="btnEmergency" type="button">Lista de emergencia</button>
+      </div>
+      <div class="list" id="rosterList"></div>
+      <div class="empty" id="rosterEmpty" style="display:none">Aún no hay niños presentes en el área infantil.</div>
+    </section>
+
+    <!-- ===== Panel: Historial ===== -->
+    <section class="panel" id="pLog" role="tabpanel">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap">
+          <div>
+            <h3>Historial del día</h3>
+            <p class="sub" style="margin-bottom:14px">Cada recepción y entrega queda registrada con hora y voluntario.</p>
+          </div>
+          <button class="btn btn-ghost btn-sm" id="btnExport" type="button">Exportar CSV</button>
+        </div>
+        <div id="logList"></div>
+        <div class="empty" id="logEmpty" style="display:none">Todavía no hay movimientos registrados.</div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- ============ MODAL: Ticket ============ -->
+<div class="overlay" id="ovTicket">
+  <div class="modal">
+    <button class="x" data-close="ovTicket" type="button">&times;</button>
+    <h3 class="no-print">Ticket de recogida</h3>
+    <p class="sub no-print">Muéstralo al padre para que le tome una foto, o envíaselo por WhatsApp.</p>
+    <div class="ticket" id="ticketBody"><!-- se genera --></div>
+    <div class="modal-actions">
+      <a class="btn btn-primary" id="btnTicketWa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+      <button class="btn btn-ghost" id="btnTicketPrint" type="button">Imprimir</button>
+      <button class="btn btn-ghost" data-close="ovTicket" type="button">Listo</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: Entrega ============ -->
+<div class="overlay" id="ovOut">
+  <div class="modal">
+    <button class="x" data-close="ovOut" type="button">&times;</button>
+    <h3>Entregar niño</h3>
+    <p class="sub">Verifica el código del ticket antes de entregar.</p>
+    <div class="fam-summary" id="outSummary"><!-- se genera --></div>
+
+    <div class="field">
+      <label for="outPin">Código del ticket del padre</label>
+      <div class="pin-box"><input type="text" id="outPin" inputmode="numeric" maxlength="4" placeholder="····" autocomplete="off" /></div>
+      <div class="pin-ok" id="pinOk">✓ Código correcto — puedes entregar.</div>
+      <div class="pin-bad" id="pinBad">✗ Código incorrecto. No entregues sin verificar.</div>
+    </div>
+
+    <div class="field">
+      <label for="outWho">¿Quién recoge?</label>
+      <input type="text" id="outWho" placeholder="Nombre de la persona que recoge" />
+      <div class="hint" id="outAuthHint"></div>
+    </div>
+
+    <details class="alt-verify" id="altVerify">
+      <summary>El padre no tiene el código (ticket perdido)</summary>
+      <div class="warn">Verifica la <strong>cédula u otro documento</strong> de la persona y confirma que coincide con los datos del registro. La entrega quedará marcada como «verificada por documento».</div>
+      <div class="field">
+        <label for="outDoc">Documento verificado (tipo y número parcial)</label>
+        <input type="text" id="outDoc" placeholder="Ej.: Cédula terminada en 619-8" />
+      </div>
+    </details>
+
+    <div style="margin-top:20px">
+      <button class="btn btn-primary" id="btnConfirmOut" type="button" style="width:100%" disabled>Confirmar entrega</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PRINT: Lista de emergencia ============ -->
+<div class="print-only" id="printEmergency">
+  <h2 style="margin-bottom:4px">Área Infantil — Lista de emergencia</h2>
+  <p style="margin-bottom:14px">Prácticum 2026 · Niños presentes en este momento</p>
+  <table class="print-table" id="emergencyTable"></table>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= Config ================= */
+  // La contraseña se valida en el servidor (Netlify Function + NINOS_PASSWORD) y el
+  // estado se comparte entre dispositivos vía Netlify Blobs. Si las funciones no
+  // están disponibles (desarrollo local / sitio estático), la página cae a "modo
+  // local": hash SHA-256 en el navegador ("practicum2026") y datos solo en este equipo.
+  var API_LOGIN = "/.netlify/functions/ninos-login";
+  var API_STATE = "/.netlify/functions/ninos-state";
+  var PASS_HASH = "1cf56b929d6335a45fcbf028e4030147e1328a2f231e790dbc7934fd9cc6fb70";
+
+  var LS_KEY = "practicum2026_ninos_v1";
+  var SS_KEY = "practicum2026_vol";
+  var TK_KEY = "practicum2026_token";
+  var PULL_MS = 20000;
+
+  /* ================= State ================= */
+  // { families:[{id,famNo,pin,parent,phone,auth,children:[{id,name,age,notes}]}], log:[{id,ts,type,childId,famId,vol,who,method,note}] }
+  var state = load();
+  function load(){
+    var s = { families:[], log:[] };
+    try{ var raw = localStorage.getItem(LS_KEY); if(raw) s = JSON.parse(raw); }catch(e){}
+    // Migración: entradas de bitácora previas sin id
+    (s.log||[]).forEach(function(l){ if(!l.id) l.id = uid(); });
+    return s;
+  }
+  function saveLocal(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+  function save(){ saveLocal(); schedulePush(); }
+
+  /* ================= Sync (Fase 2) ================= */
+  var token = sessionStorage.getItem(TK_KEY) || "";
+  var syncEnabled = false;
+  var pushTimer = null, pullTimer = null;
+
+  function setSync(status){ // "ok" | "err" | "local"
+    var el = document.getElementById("syncState");
+    if(!el) return;
+    if(status==="ok"){ el.textContent="● Sincronizado"; el.style.color="#7FC79B"; }
+    else if(status==="err"){ el.textContent="● Sin conexión"; el.style.color="#E8A48C"; }
+    else { el.textContent="● Modo local"; el.style.color="#C9BBA6"; }
+  }
+  // Igual que la unión del servidor: familias inmutables + bitácora append-only
+  function mergeStates(base, incoming){
+    var famIds={}; base.families.forEach(function(f){famIds[f.id]=1});
+    var families = base.families.concat((incoming.families||[]).filter(function(f){return f&&f.id&&!famIds[f.id]}));
+    families.sort(function(x,y){return String(x.createdAt||"").localeCompare(String(y.createdAt||""))});
+    var logIds={}; base.log.forEach(function(l){logIds[l.id]=1});
+    var log = base.log.concat((incoming.log||[]).filter(function(l){return l&&l.id&&!logIds[l.id]}));
+    log.sort(function(x,y){return String(x.ts||"").localeCompare(String(y.ts||""))});
+    return { families:families, log:log };
+  }
+  function applyServer(server){
+    var merged = mergeStates(state, server||{families:[],log:[]});
+    if(JSON.stringify(merged)!==JSON.stringify(state)){
+      state = merged; saveLocal(); renderAll();
+    }
+  }
+  function pushState(){
+    if(!syncEnabled) return;
+    fetch(API_STATE,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(state)})
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(d){ applyServer(d); setSync("ok"); })
+      .catch(function(){ setSync("err"); });
+  }
+  function schedulePush(){
+    if(!syncEnabled) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushState, 400);
+  }
+  function pullState(){
+    if(!syncEnabled) return;
+    fetch(API_STATE,{headers:{"Authorization":"Bearer "+token}})
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(d){ applyServer(d); setSync("ok"); })
+      .catch(function(){ setSync("err"); });
+  }
+  function startSync(){
+    setSync("ok");
+    pullState();
+    clearInterval(pullTimer);
+    pullTimer = setInterval(pullState, PULL_MS);
+    document.addEventListener("visibilitychange", function(){ if(!document.hidden) pullState(); });
+  }
+
+  function famById(id){ return state.families.find(function(f){return f.id===id}); }
+  function childById(id){
+    for(var i=0;i<state.families.length;i++){
+      var c = state.families[i].children.find(function(k){return k.id===id});
+      if(c) return { child:c, fam:state.families[i] };
+    }
+    return null;
+  }
+  // Estado actual de un niño según su último movimiento
+  function childStatus(childId){
+    for(var i=state.log.length-1;i>=0;i--){
+      if(state.log[i].childId===childId) return state.log[i].type; // "in" | "out"
+    }
+    return null;
+  }
+  function allChildren(){
+    var out=[];
+    state.families.forEach(function(f){ f.children.forEach(function(c){ out.push({child:c,fam:f}); }); });
+    return out;
+  }
+  function uid(){ return Math.random().toString(36).slice(2,10); }
+  function now(){ return new Date().toISOString(); }
+  function fmtTime(iso){
+    var d=new Date(iso);
+    var h=d.getHours(), m=("0"+d.getMinutes()).slice(-2);
+    var ap=h>=12?"p.m.":"a.m."; h=h%12; if(h===0)h=12;
+    return h+":"+m+" "+ap;
+  }
+  function esc(s){ return String(s||"").replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+  function initials(name){
+    return String(name||"?").trim().split(/\s+/).slice(0,2).map(function(w){return w[0]||""}).join("").toUpperCase();
+  }
+
+  /* ================= Login ================= */
+  var $ = function(id){ return document.getElementById(id); };
+  var viewLogin=$("viewLogin"), viewApp=$("viewApp");
+
+  function sha256(str){
+    var data = new TextEncoder().encode(str);
+    return crypto.subtle.digest("SHA-256", data).then(function(buf){
+      return Array.prototype.map.call(new Uint8Array(buf),function(b){return ("0"+b.toString(16)).slice(-2)}).join("");
+    });
+  }
+  function currentVol(){ return sessionStorage.getItem(SS_KEY) || ""; }
+  function enterApp(){
+    viewLogin.style.display="none";
+    viewApp.style.display="block";
+    $("whoName").textContent = currentVol();
+    renderAll();
+    if(syncEnabled) startSync(); else setSync("local");
+  }
+  function showLoginErr(msg){ $("loginErr").textContent=msg; $("loginErr").style.display="block"; }
+  function loginOk(name){ sessionStorage.setItem(SS_KEY,name); enterApp(); }
+  $("btnLogin").addEventListener("click", tryLogin);
+  $("volPass").addEventListener("keydown", function(e){ if(e.key==="Enter") tryLogin(); });
+  function tryLogin(){
+    var name = $("volName").value.trim();
+    var pass = $("volPass").value;
+    $("loginErr").style.display="none";
+    if(!name){ showLoginErr("Escribe tu nombre para continuar."); return; }
+    // 1) Validación en el servidor (Netlify Function + NINOS_PASSWORD)
+    fetch(API_LOGIN,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({password:pass})})
+      .then(function(r){
+        if(r.status===401){ showLoginErr("Contraseña incorrecta. Inténtalo de nuevo."); return; }
+        if(!r.ok) throw 0;
+        return r.json().then(function(d){
+          token=d.token; sessionStorage.setItem(TK_KEY,token);
+          syncEnabled=true; loginOk(name);
+        });
+      })
+      // 2) Funciones no disponibles (desarrollo local / sitio estático) → modo local
+      .catch(function(){ localLogin(name, pass); });
+  }
+  function localLogin(name, pass){
+    syncEnabled=false;
+    if(!window.crypto || !crypto.subtle){
+      if(pass==="practicum2026") loginOk(name);
+      else showLoginErr("Contraseña incorrecta. Inténtalo de nuevo.");
+      return;
+    }
+    sha256(pass).then(function(h){
+      if(h===PASS_HASH) loginOk(name);
+      else showLoginErr("Contraseña incorrecta. Inténtalo de nuevo.");
+    });
+  }
+  $("btnLogout").addEventListener("click", function(){
+    sessionStorage.removeItem(SS_KEY);
+    sessionStorage.removeItem(TK_KEY);
+    token=""; syncEnabled=false;
+    clearInterval(pullTimer); clearTimeout(pushTimer);
+    viewApp.style.display="none";
+    viewLogin.style.display="flex";
+    $("volPass").value="";
+  });
+  if(currentVol()){ syncEnabled = !!token; enterApp(); }
+
+  /* ================= Tabs ================= */
+  var tabs=document.querySelectorAll(".tab");
+  tabs.forEach(function(t){
+    t.addEventListener("click",function(){
+      tabs.forEach(function(x){x.classList.remove("on")});
+      document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("on")});
+      t.classList.add("on");
+      $(t.getAttribute("data-panel")).classList.add("on");
+    });
+  });
+
+  /* ================= Form: niños dinámicos ================= */
+  var childRows=$("childRows");
+  function addChildRow(){
+    var div=document.createElement("div");
+    div.className="child-row";
+    div.innerHTML =
+      '<div class="grid-child">'+
+        '<div class="field" style="margin:0"><label>Nombre del niño</label><input type="text" class="c-name" placeholder="Ej.: Lucas" /></div>'+
+        '<div class="field" style="margin:0"><label>Edad</label><input type="number" class="c-age" min="0" max="17" inputmode="numeric" placeholder="6" /></div>'+
+        '<div class="field span2" style="margin:0"><label>Alergias o notas (opcional)</label><input type="text" class="c-notes" placeholder="Ej.: alérgico al maní" /></div>'+
+        '<button class="rm" type="button" title="Quitar niño">&times;</button>'+
+      '</div>';
+    div.querySelector(".rm").addEventListener("click",function(){
+      if(childRows.children.length>1) div.remove();
+    });
+    childRows.appendChild(div);
+  }
+  $("btnAddChild").addEventListener("click", addChildRow);
+  addChildRow();
+
+  /* ================= Check-in ================= */
+  var lastTicketFamId = null;
+
+  $("btnCheckin").addEventListener("click", function(){
+    var parent=$("fParent").value.trim();
+    var phone=$("fPhone").value.trim();
+    var auth=$("fAuth").value.trim();
+    if(!parent){ alert("Escribe el nombre del padre, madre o tutor."); return; }
+    var children=[];
+    childRows.querySelectorAll(".child-row").forEach(function(r){
+      var name=r.querySelector(".c-name").value.trim();
+      var age=r.querySelector(".c-age").value.trim();
+      var notes=r.querySelector(".c-notes").value.trim();
+      if(name) children.push({ id:uid(), name:name, age:age, notes:notes });
+    });
+    if(!children.length){ alert("Agrega al menos un niño con su nombre."); return; }
+
+    var famNo = state.families.reduce(function(m,f){return Math.max(m,f.famNo||0)},0)+1;
+    var pin = String(Math.floor(1000+Math.random()*9000));
+    var fam = { id:uid(), famNo:famNo, pin:pin, parent:parent, phone:phone, auth:auth, children:children, createdAt:now() };
+    state.families.push(fam);
+    children.forEach(function(c){
+      state.log.push({ id:uid(), ts:now(), type:"in", childId:c.id, famId:fam.id, vol:currentVol(), who:parent, method:"registro", note:"" });
+    });
+    save();
+
+    // limpiar formulario
+    $("fParent").value=""; $("fPhone").value=""; $("fAuth").value="";
+    childRows.innerHTML=""; addChildRow();
+
+    renderAll();
+    showTicket(fam.id);
+  });
+
+  /* ================= Ticket ================= */
+  function ticketText(fam){
+    var lines=[
+      "*Área Infantil · Prácticum 2026*",
+      "Ticket de recogida — Familia F-"+("0"+fam.famNo).slice(-2),
+      "",
+      "Código de recogida: *"+fam.pin+"*",
+      "",
+      "Niños:"
+    ];
+    fam.children.forEach(function(c){ lines.push("· "+c.name+(c.age?" ("+c.age+" años)":"")); });
+    lines.push("","Presenta este código al recoger a tus hijos. Si lo pierdes, trae tu cédula.");
+    return lines.join("\n");
+  }
+  function showTicket(famId){
+    var fam=famById(famId); if(!fam) return;
+    lastTicketFamId=famId;
+    var kids=fam.children.map(function(c){
+      return '<li><span class="kn">'+esc(c.name)+'</span><span class="ka">'+(c.age?esc(c.age)+" años":"")+(c.notes?" · "+esc(c.notes):"")+'</span></li>';
+    }).join("");
+    $("ticketBody").innerHTML =
+      '<div class="ticket-head">'+
+        '<img src="cc-logo-white.svg" alt="Classical Conversations" />'+
+        '<div class="tt">Área Infantil · Ticket de recogida</div>'+
+        '<div class="ts">Prácticum 2026 · Familia F-'+("0"+fam.famNo).slice(-2)+'</div>'+
+      '</div>'+
+      '<div class="ticket-code">'+
+        '<div class="lbl">Código de recogida</div>'+
+        '<div class="code">F-'+("0"+fam.famNo).slice(-2)+' · <span>'+fam.pin+'</span></div>'+
+      '</div>'+
+      '<ul class="ticket-kids">'+kids+'</ul>'+
+      '<div class="ticket-foot"><strong>'+esc(fam.parent)+'</strong> — presenta este código al recoger.'+
+      ' Si pierdes el ticket, trae tu cédula. '+(fam.auth?('Autorizados: '+esc(fam.auth)+'.'):'')+'</div>';
+    var wa = fam.phone ? ("https://wa.me/1"+fam.phone.replace(/\D/g,"").replace(/^1/,"")+"?text="+encodeURIComponent(ticketText(fam)))
+                       : ("https://wa.me/?text="+encodeURIComponent(ticketText(fam)));
+    $("btnTicketWa").setAttribute("href", wa);
+    openOv("ovTicket");
+  }
+  $("btnTicketPrint").addEventListener("click", function(){ window.print(); });
+
+  /* ================= Roster ================= */
+  function renderRoster(){
+    var q=$("rosterSearch").value.trim().toLowerCase();
+    var list=$("rosterList"); list.innerHTML="";
+    var present = allChildren().filter(function(x){ return childStatus(x.child.id)==="in"; });
+    if(q){
+      present = present.filter(function(x){
+        return (x.child.name+" "+x.fam.parent+" F-"+("0"+x.fam.famNo).slice(-2)+" "+x.fam.pin).toLowerCase().indexOf(q)>=0;
+      });
+    }
+    $("rosterEmpty").style.display = present.length? "none":"block";
+    present.forEach(function(x){
+      var inLog = state.log.filter(function(l){return l.childId===x.child.id && l.type==="in"}).pop();
+      var div=document.createElement("div");
+      div.className="row";
+      div.innerHTML =
+        '<div class="avatar">'+esc(initials(x.child.name))+'</div>'+
+        '<div class="info">'+
+          '<div class="nm">'+esc(x.child.name)+
+            (x.child.notes?'<span class="chip alergia">'+esc(x.child.notes)+'</span>':'')+
+            '<span class="chip code">F-'+("0"+x.fam.famNo).slice(-2)+'</span>'+
+          '</div>'+
+          '<div class="meta">'+(x.child.age?x.child.age+" años · ":"")+'Familia de <strong>'+esc(x.fam.parent)+'</strong>'+
+          (inLog?' · entró '+fmtTime(inLog.ts):'')+'</div>'+
+        '</div>'+
+        '<button class="btn btn-primary btn-sm" type="button">Entregar</button>';
+      div.querySelector("button").addEventListener("click",function(){ openOut(x.child.id); });
+      list.appendChild(div);
+    });
+  }
+  $("rosterSearch").addEventListener("input", renderRoster);
+
+  /* ================= Entrega (check-out) ================= */
+  var outChildId=null, pinVerified=false;
+  function openOut(childId){
+    var x=childById(childId); if(!x) return;
+    outChildId=childId; pinVerified=false;
+    $("outSummary").innerHTML =
+      '<div class="fn">'+esc(x.child.name)+(x.child.age?' · '+esc(x.child.age)+' años':'')+'</div>'+
+      '<p>Familia <strong>F-'+("0"+x.fam.famNo).slice(-2)+'</strong> — '+esc(x.fam.parent)+
+      (x.fam.phone?' · '+esc(x.fam.phone):'')+'</p>'+
+      (x.child.notes?'<p><span class="chip alergia">'+esc(x.child.notes)+'</span></p>':'');
+    $("outPin").value=""; $("pinOk").style.display="none"; $("pinBad").style.display="none";
+    $("outWho").value=x.fam.parent;
+    $("outAuthHint").textContent = x.fam.auth ? ("Autorizados: "+x.fam.parent+", "+x.fam.auth) : ("Autorizado: "+x.fam.parent);
+    $("outDoc").value="";
+    $("altVerify").removeAttribute("open");
+    $("btnConfirmOut").disabled=true;
+    openOv("ovOut");
+    setTimeout(function(){ $("outPin").focus(); },50);
+  }
+  function updateOutState(){
+    var x=childById(outChildId); if(!x) return;
+    var pin=$("outPin").value.trim();
+    var doc=$("outDoc").value.trim();
+    if(pin.length===4){
+      pinVerified = (pin===x.fam.pin);
+      $("pinOk").style.display = pinVerified?"block":"none";
+      $("pinBad").style.display = pinVerified?"none":"block";
+    } else {
+      pinVerified=false;
+      $("pinOk").style.display="none"; $("pinBad").style.display="none";
+    }
+    $("btnConfirmOut").disabled = !(pinVerified || doc.length>3);
+  }
+  $("outPin").addEventListener("input", updateOutState);
+  $("outDoc").addEventListener("input", updateOutState);
+  $("btnConfirmOut").addEventListener("click", function(){
+    var x=childById(outChildId); if(!x) return;
+    var who=$("outWho").value.trim() || x.fam.parent;
+    var doc=$("outDoc").value.trim();
+    var method = pinVerified ? "codigo" : "documento";
+    state.log.push({ id:uid(), ts:now(), type:"out", childId:x.child.id, famId:x.fam.id, vol:currentVol(), who:who, method:method, note:doc });
+    save();
+    closeOv("ovOut");
+    renderAll();
+  });
+
+  /* ================= Historial ================= */
+  function renderLog(){
+    var list=$("logList"); list.innerHTML="";
+    var reAdded={};
+    $("logEmpty").style.display = state.log.length? "none":"block";
+    state.log.slice().reverse().forEach(function(l){
+      var x=childById(l.childId); if(!x) return;
+      var div=document.createElement("div");
+      div.className="log-item";
+      var action = l.type==="in"
+        ? '<span class="lg-in">Recibido</span>'
+        : '<span class="lg-out">Entregado</span>';
+      var detail = l.type==="in"
+        ? (l.method==="reingreso" ? "Reingreso · recibió "+esc(l.vol) : "Entregado por "+esc(l.who)+" · recibió "+esc(l.vol))
+        : "Recogido por "+esc(l.who)+" ("+(l.method==="codigo"?"código verificado":"documento: "+esc(l.note))+") · entregó "+esc(l.vol);
+      div.innerHTML =
+        '<div class="tm">'+fmtTime(l.ts)+'</div>'+
+        '<div class="tx">'+action+' — <strong>'+esc(x.child.name)+'</strong> · F-'+("0"+x.fam.famNo).slice(-2)+
+        '<small>'+detail+'</small></div>';
+      // Reingreso: si el último movimiento del niño es una entrega, permitir recibirlo de nuevo
+      if(l.type==="out" && childStatus(l.childId)==="out" && !reAdded[l.childId]){
+        reAdded[l.childId]=true;
+        var back=document.createElement("button");
+        back.className="btn btn-ghost btn-sm"; back.type="button"; back.textContent="Reingresar";
+        back.style.cssText="margin-left:auto;flex:none;align-self:center";
+        back.addEventListener("click",function(){
+          state.log.push({ id:uid(), ts:now(), type:"in", childId:x.child.id, famId:x.fam.id, vol:currentVol(), who:x.fam.parent, method:"reingreso", note:"" });
+          save(); renderAll();
+        });
+        div.appendChild(back);
+      }
+      list.appendChild(div);
+    });
+  }
+
+  /* ================= Export CSV ================= */
+  $("btnExport").addEventListener("click", function(){
+    var rows=[["Hora","Movimiento","Niño","Edad","Familia","Padre/Madre","Teléfono","Persona","Método","Nota","Voluntario"]];
+    state.log.forEach(function(l){
+      var x=childById(l.childId); if(!x) return;
+      rows.push([ new Date(l.ts).toLocaleString("es-DO"), l.type==="in"?"Recepción":"Entrega",
+        x.child.name, x.child.age||"", "F-"+("0"+x.fam.famNo).slice(-2), x.fam.parent, x.fam.phone||"",
+        l.who||"", l.method||"", l.note||"", l.vol||"" ]);
+    });
+    var csv = rows.map(function(r){ return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(","); }).join("\n");
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"}));
+    a.download="area-infantil-practicum2026.csv";
+    a.click();
+  });
+
+  /* ================= Lista de emergencia (print) ================= */
+  $("btnEmergency").addEventListener("click", function(){
+    var present = allChildren().filter(function(x){ return childStatus(x.child.id)==="in"; });
+    var html='<tr><th>Niño</th><th>Edad</th><th>Alergias/notas</th><th>Familia</th><th>Padre/Madre</th><th>Teléfono</th></tr>';
+    present.forEach(function(x){
+      html+='<tr><td>'+esc(x.child.name)+'</td><td>'+esc(x.child.age||"")+'</td><td>'+esc(x.child.notes||"")+
+            '</td><td>F-'+("0"+x.fam.famNo).slice(-2)+'</td><td>'+esc(x.fam.parent)+'</td><td>'+esc(x.fam.phone||"")+'</td></tr>';
+    });
+    $("emergencyTable").innerHTML=html;
+    $("printEmergency").classList.add("on");
+    window.print();
+    setTimeout(function(){ $("printEmergency").classList.remove("on"); },300);
+  });
+
+  /* ================= Overlays ================= */
+  function openOv(id){ $(id).classList.add("on"); }
+  function closeOv(id){ $(id).classList.remove("on"); }
+  document.querySelectorAll("[data-close]").forEach(function(b){
+    b.addEventListener("click",function(){ closeOv(b.getAttribute("data-close")); });
+  });
+  document.querySelectorAll(".overlay").forEach(function(ov){
+    ov.addEventListener("click",function(e){ if(e.target===ov) ov.classList.remove("on"); });
+  });
+
+  /* ================= Render all ================= */
+  function renderAll(){
+    var all=allChildren();
+    var present=all.filter(function(x){return childStatus(x.child.id)==="in"}).length;
+    var out=all.filter(function(x){return childStatus(x.child.id)==="out"}).length;
+    $("stPresent").textContent=present;
+    $("stTotal").textContent=all.length;
+    $("stOut").textContent=out;
+    $("tabBadge").textContent=present;
+    renderRoster();
+    renderLog();
+  }
+  renderAll();
+})();
+</script>
+</body>
+</html>
