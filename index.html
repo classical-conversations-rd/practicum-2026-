@@ -937,10 +937,14 @@
     var panelCard=document.getElementById("panelCard"),panelTransfer=document.getElementById("panelTransfer");
     var pms=document.querySelectorAll(".pm"), prices=document.querySelectorAll(".pi-price");
     var WA="https://wa.me/18492016825?text=", method="card";
-    // Descuento familias CC: se activa solo si la URL trae ?promo=CCRD2026.
-    // Refleja en pantalla el mismo descuento que Stripe aplica (28% en adultos).
-    var PROMO={code:"CCRD2026",pct:0.28,item:"qAd",label:"Descuento familias CC"};
-    var activePromo=(function(){var p=(new URLSearchParams(location.search).get("promo")||"").trim();return p.toUpperCase()===PROMO.code?PROMO:null;})();
+    // Descuentos por código: se activan solo si la URL trae ?promo=<código>.
+    // Cada entrada refleja en pantalla el mismo descuento que Stripe aplica en adultos;
+    // el pct debe coincidir con el cupón configurado en Stripe.
+    var PROMOS={
+      "CCRD2026":{pct:0.28,item:"qAd",label:"Descuento familias CC"},
+      "HOMELIFE":{pct:0.20,item:"qAd",label:"Descuento familias HomeLife Academy"}
+    };
+    var activePromo=(function(){var p=(new URLSearchParams(location.search).get("promo")||"").trim().toUpperCase();return PROMOS[p]||null;})();
     var promoNote=document.createElement("div");
     promoNote.id="promoNote";
     promoNote.style.cssText="display:none;margin:2px 0 0;font-weight:700;color:var(--orange-deep,#C4571F)";
