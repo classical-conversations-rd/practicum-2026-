@@ -74,7 +74,7 @@ Fuentes principales: documentación de soporte de ChurchSuite (Getting started w
    - **Si no incluye niños**, no hay nada más que hacer: la llegada queda registrada.
 3. **Almuerzos:** si la boleta incluye comida, tras recibirla aparece el botón **«Entregar N almuerzos»**. Al pulsarlo queda el chip «✓ N almuerzos» con hora y voluntario — así la mesa de comida verifica que nadie retire dos veces. El contador de la pestaña muestra «X de 42 almuerzos entregados».
 4. Un toque en «deshacer» (o «deshacer almuerzos») revierte una marca hecha por error (se registra como movimiento nuevo, no se borra nada).
-5. **Walk-ins** (no aparecen en la lista): botón directo a «Recibir niños», que sigue funcionando igual que antes.
+5. **Walk-ins (compra en sitio):** el botón **«+ Nueva familia»** (o el atajo cuando la búsqueda no encuentra a nadie) abre un modal con nombre, adultos, niños, almuerzos y correo opcional. Al guardar, la familia se agrega a la **lista compartida** (`walkins`, sincronizada entre dispositivos, con voluntario y hora de creación), queda marcada «Recibida» al instante, se distingue con el chip «En sitio», y sigue el mismo flujo que una reserva (niños → ticket, almuerzos, deshacer).
 6. **«Exportar llegadas»** descarga el CSV de asistencia (recibida/pendiente, hora, voluntario, almuerzos entregados).
 
 ### 5.1 Recepción (check-in)
@@ -141,11 +141,15 @@ Almacenado como JSON (v1: `localStorage`, clave `practicum2026_ninos_v1`):
     children: [{ id, name, age, notes }],
     createdAt
   }],
-  arrivals: [{            // llegadas de boletas: también append-only
+  arrivals: [{            // llegadas y almuerzos de boletas: también append-only
     id, ts,
-    attendeeId,           // id estable de la boleta (lista incrustada en la página)
-    type,                 // "in" (recibida) | "cancel" (deshecha)
+    attendeeId,           // id estable de la boleta (lista incrustada o walk-in)
+    type,                 // "in" | "cancel" | "meal" | "meal-cancel"
     vol
+  }],
+  walkins: [{             // familias agregadas en sitio (sin reserva): append-only
+    id, ts, name, email, adults, kids, meals,
+    vol                   // voluntario que la agregó
   }],
   log: [{                 // bitácora "append-only": nunca se edita ni borra
     ts, type,             // "in" | "out"

@@ -37,7 +37,13 @@ export function mergeStates(base, incoming) {
     (incoming.arrivals || []).filter((a) => a && a.id && !arrIds.has(a.id))
   );
   arrivals.sort((x, y) => String(x.ts || "").localeCompare(String(y.ts || "")));
-  return { families, log, arrivals };
+  const baseWalkins = base.walkins || [];
+  const wkIds = new Set(baseWalkins.map((w) => w.id));
+  const walkins = baseWalkins.concat(
+    (incoming.walkins || []).filter((w) => w && w.id && !wkIds.has(w.id))
+  );
+  walkins.sort((x, y) => String(x.ts || "").localeCompare(String(y.ts || "")));
+  return { families, log, arrivals, walkins };
 }
 
 export default async (req) => {

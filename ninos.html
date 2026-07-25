@@ -321,13 +321,14 @@
     <section class="panel on" id="pArrivals" role="tabpanel">
       <div class="searchbar">
         <input type="text" id="arrSearch" placeholder="Buscar por nombre o correo…" />
+        <button class="btn btn-primary btn-sm" id="btnNewFam" type="button">+ Nueva familia</button>
         <button class="btn btn-ghost btn-sm" id="btnArrExport" type="button">Exportar llegadas</button>
       </div>
       <div class="arrivals-count" id="arrCount"></div>
       <div class="list" id="arrList"></div>
       <div class="empty" id="arrEmpty" style="display:none">
         No aparece en la lista de boletas.<br/>
-        <button class="btn btn-ghost btn-sm" id="btnArrWalkin" type="button" style="margin-top:14px">Registrarla en «Recibir niños»</button>
+        <button class="btn btn-ghost btn-sm" id="btnArrWalkin" type="button" style="margin-top:14px">+ Agregarla como nueva familia</button>
       </div>
     </section>
 
@@ -408,6 +409,40 @@
       <button class="btn btn-ghost" id="btnTicketPrint" type="button">Imprimir</button>
       <button class="btn btn-ghost" data-close="ovTicket" type="button">Listo</button>
     </div>
+  </div>
+</div>
+
+<!-- ============ MODAL: Nueva familia (compra en sitio) ============ -->
+<div class="overlay" id="ovNew">
+  <div class="modal">
+    <button class="x" data-close="ovNew" type="button">&times;</button>
+    <h3>Nueva familia</h3>
+    <p class="sub">Para quien llega sin reserva previa (compra en sitio). Quedará en la lista de llegadas igual que el resto.</p>
+    <div class="field">
+      <label for="nfName">Nombre del padre / madre / tutor</label>
+      <input type="text" id="nfName" placeholder="Ej.: Ana Rodríguez" />
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label for="nfAdults">Adultos</label>
+        <input type="number" id="nfAdults" min="1" max="10" inputmode="numeric" value="1" />
+      </div>
+      <div class="field">
+        <label for="nfKids">Niños</label>
+        <input type="number" id="nfKids" min="0" max="10" inputmode="numeric" value="0" />
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label for="nfMeals">Almuerzos</label>
+        <input type="number" id="nfMeals" min="0" max="12" inputmode="numeric" value="0" />
+      </div>
+      <div class="field">
+        <label for="nfEmail">Correo (opcional)</label>
+        <input type="text" id="nfEmail" placeholder="correo@ejemplo.com" />
+      </div>
+    </div>
+    <button class="btn btn-primary" id="btnNfSave" type="button" style="width:100%;margin-top:6px">Agregar y recibir</button>
   </div>
 </div>
 
@@ -513,19 +548,27 @@
     { id:"rosa-cc",             name:"Rosa (CC)",                 email:"",                                 adults:1, kids:0, meals:0 },
     { id:"suly-encarnacion",    name:"Suly Encarnación",          email:"kprosariot@gmail.com",             adults:1, kids:2, meals:1 }
   ];
-  function attendeeById(id){ return ATTENDEES.find(function(a){return a.id===id}); }
+  // Boletas de la hoja + familias agregadas en sitio (compartidas entre dispositivos)
+  function allAttendees(){
+    return ATTENDEES.concat((state.walkins||[]).map(function(w){
+      return { id:w.id, name:w.name, email:w.email||"", adults:w.adults||1, kids:w.kids||0, meals:w.meals||0, walkin:true };
+    }));
+  }
+  function attendeeById(id){ return allAttendees().find(function(a){return a.id===id}); }
 
   /* ================= State ================= */
   // { families:[{id,famNo,pin,parent,phone,auth,attendeeId?,children:[{id,name,age,notes}]}],
   //   log:[{id,ts,type,childId,famId,vol,who,method,note}],
-  //   arrivals:[{id,ts,attendeeId,type:"in"|"cancel"|"meal"|"meal-cancel",vol}] }  (append-only)
+  //   arrivals:[{id,ts,attendeeId,type:"in"|"cancel"|"meal"|"meal-cancel",vol}],
+  //   walkins:[{id,ts,name,email,adults,kids,meals,vol}] }  (todo append-only)
   var state = load();
   function load(){
-    var s = { families:[], log:[], arrivals:[] };
+    var s = { families:[], log:[], arrivals:[], walkins:[] };
     try{ var raw = localStorage.getItem(LS_KEY); if(raw) s = JSON.parse(raw); }catch(e){}
     // Migración: entradas de bitácora previas sin id / estados sin llegadas
     (s.log||[]).forEach(function(l){ if(!l.id) l.id = uid(); });
     if(!s.arrivals) s.arrivals = [];
+    if(!s.walkins) s.walkins = [];
     return s;
   }
   function saveLocal(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
@@ -555,10 +598,14 @@
     var arrIds={}; baseArr.forEach(function(a){arrIds[a.id]=1});
     var arrivals = baseArr.concat((incoming.arrivals||[]).filter(function(a){return a&&a.id&&!arrIds[a.id]}));
     arrivals.sort(function(x,y){return String(x.ts||"").localeCompare(String(y.ts||""))});
-    return { families:families, log:log, arrivals:arrivals };
+    var baseWk = base.walkins||[];
+    var wkIds={}; baseWk.forEach(function(w){wkIds[w.id]=1});
+    var walkins = baseWk.concat((incoming.walkins||[]).filter(function(w){return w&&w.id&&!wkIds[w.id]}));
+    walkins.sort(function(x,y){return String(x.ts||"").localeCompare(String(y.ts||""))});
+    return { families:families, log:log, arrivals:arrivals, walkins:walkins };
   }
   function applyServer(server){
-    var merged = mergeStates(state, server||{families:[],log:[],arrivals:[]});
+    var merged = mergeStates(state, server||{families:[],log:[],arrivals:[],walkins:[]});
     if(JSON.stringify(merged)!==JSON.stringify(state)){
       state = merged; saveLocal(); renderAll();
     }
@@ -730,13 +777,14 @@
   function renderArrivals(){
     var q=norm($("arrSearch").value.trim());
     var list=$("arrList"); list.innerHTML="";
-    var items = ATTENDEES.slice().sort(function(a,b){return a.name.localeCompare(b.name,"es")});
+    var everyone = allAttendees();
+    var items = everyone.slice().sort(function(a,b){return a.name.localeCompare(b.name,"es")});
     if(q){ items = items.filter(function(a){ return (norm(a.name)+" "+norm(a.email)).indexOf(q)>=0; }); }
 
-    var arrived = ATTENDEES.filter(function(a){return isArrived(a.id)}).length;
-    var mealsTotal = ATTENDEES.reduce(function(s,a){return s+(a.meals||0)},0);
-    var mealsOut = ATTENDEES.reduce(function(s,a){return s+(mealsDelivered(a.id)?(a.meals||0):0)},0);
-    $("arrCount").innerHTML = "<strong>"+arrived+"</strong> de <strong>"+ATTENDEES.length+"</strong> boletas recibidas · <strong>"+mealsOut+"</strong> de <strong>"+mealsTotal+"</strong> almuerzos entregados";
+    var arrived = everyone.filter(function(a){return isArrived(a.id)}).length;
+    var mealsTotal = everyone.reduce(function(s,a){return s+(a.meals||0)},0);
+    var mealsOut = everyone.reduce(function(s,a){return s+(mealsDelivered(a.id)?(a.meals||0):0)},0);
+    $("arrCount").innerHTML = "<strong>"+arrived+"</strong> de <strong>"+everyone.length+"</strong> boletas recibidas · <strong>"+mealsOut+"</strong> de <strong>"+mealsTotal+"</strong> almuerzos entregados";
     $("arrEmpty").style.display = items.length? "none":"block";
 
     items.forEach(function(a){
@@ -752,6 +800,7 @@
       if(a.meals) metaBits.push(a.meals+(a.meals===1?" almuerzo":" almuerzos"));
       if(a.email) metaBits.push(a.email);
       var chips="";
+      if(a.walkin) chips+='<span class="chip code" style="background:var(--orange-deep)">En sitio</span>';
       if(inNow) chips+='<span class="chip ok">✓ Recibida '+fmtTime(arr.ts)+'</span>';
       if(fam) chips+='<span class="chip code">F-'+("0"+fam.famNo).slice(-2)+'</span>';
       if(mealOk) chips+='<span class="chip ok">✓ '+a.meals+(a.meals===1?' almuerzo':' almuerzos')+' '+fmtTime(meal.ts)+'</span>';
@@ -834,21 +883,42 @@
   }
   $("btnUnlink").addEventListener("click", clearPendingAttendee);
   $("arrSearch").addEventListener("input", renderArrivals);
-  $("btnArrWalkin").addEventListener("click", function(){
-    var q=$("arrSearch").value.trim();
-    clearPendingAttendee();
-    if(q) $("fParent").value=q;
-    selectTab("pReceive");
+
+  // Nueva familia sin reserva: se agrega a la lista compartida y se recibe al momento
+  function openNewFam(prefillName){
+    $("nfName").value = prefillName||"";
+    $("nfAdults").value = "1"; $("nfKids").value = "0"; $("nfMeals").value = "0"; $("nfEmail").value = "";
+    openOv("ovNew");
+    setTimeout(function(){ $("nfName").focus(); },50);
+  }
+  $("btnNewFam").addEventListener("click", function(){ openNewFam($("arrSearch").value.trim()); });
+  $("btnArrWalkin").addEventListener("click", function(){ openNewFam($("arrSearch").value.trim()); });
+  $("btnNfSave").addEventListener("click", function(){
+    var name=$("nfName").value.trim();
+    if(!name){ alert("Escribe el nombre del padre, madre o tutor."); return; }
+    var wk = {
+      id:uid(), ts:now(), name:name,
+      email:$("nfEmail").value.trim(),
+      adults:Math.max(1, parseInt($("nfAdults").value,10)||1),
+      kids:Math.max(0, parseInt($("nfKids").value,10)||0),
+      meals:Math.max(0, parseInt($("nfMeals").value,10)||0),
+      vol:currentVol()
+    };
+    state.walkins.push(wk);
+    save();
+    closeOv("ovNew");
+    $("arrSearch").value="";
+    receiveAttendee(attendeeById(wk.id));
   });
 
   $("btnArrExport").addEventListener("click", function(){
-    var rows=[["Nombre","Correo","Adultos","Niños (reserva)","Almuerzos","Estado","Hora llegada","Recibió","Almuerzos entregados","Hora almuerzos","Entregó almuerzos"]];
-    ATTENDEES.slice().sort(function(a,b){return a.name.localeCompare(b.name,"es")}).forEach(function(a){
+    var rows=[["Nombre","Correo","Origen","Adultos","Niños (reserva)","Almuerzos","Estado","Hora llegada","Recibió","Almuerzos entregados","Hora almuerzos","Entregó almuerzos"]];
+    allAttendees().sort(function(a,b){return a.name.localeCompare(b.name,"es")}).forEach(function(a){
       var arr=lastArrival(a.id);
       var inNow=!!(arr && arr.type==="in");
       var meal=lastMeal(a.id);
       var mealOk=!!(meal && meal.type==="meal");
-      rows.push([ a.name, a.email||"", a.adults, a.kids||0, a.meals||0,
+      rows.push([ a.name, a.email||"", a.walkin?"En sitio":"Reserva", a.adults, a.kids||0, a.meals||0,
         inNow?"Recibida":"Pendiente",
         inNow?new Date(arr.ts).toLocaleString("es-DO"):"",
         inNow?(arr.vol||""):"",
@@ -1123,8 +1193,9 @@
     var all=allChildren();
     var present=all.filter(function(x){return childStatus(x.child.id)==="in"}).length;
     var out=all.filter(function(x){return childStatus(x.child.id)==="out"}).length;
-    var arrived=ATTENDEES.filter(function(a){return isArrived(a.id)}).length;
-    $("stArrived").textContent=arrived+"/"+ATTENDEES.length;
+    var everyone=allAttendees();
+    var arrived=everyone.filter(function(a){return isArrived(a.id)}).length;
+    $("stArrived").textContent=arrived+"/"+everyone.length;
     $("stPresent").textContent=present;
     $("stTotal").textContent=all.length;
     $("stOut").textContent=out;
