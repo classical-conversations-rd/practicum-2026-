@@ -99,7 +99,7 @@
   .topbar .who button{background:none;border:1px solid rgba(244,236,224,.35);color:#EADFCE;border-radius:3px;padding:5px 12px;font-family:inherit;font-size:13.5px;cursor:pointer;transition:.2s}
   .topbar .who button:hover{background:var(--orange);border-color:var(--orange);color:#fff}
 
-  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0 8px}
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:26px 0 8px}
   .stat{text-align:center;padding:18px 10px;background:var(--cream-card);border:1px solid var(--line-soft);border-radius:4px}
   .stat .n{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:38px;color:var(--navy);line-height:1}
   .stat .n.g{color:var(--green)}
@@ -157,6 +157,19 @@
   .chip.code{background:var(--navy);color:#fff;letter-spacing:.1em}
   .chip.ok{background:rgba(46,125,79,.12);color:var(--green);border:1px solid rgba(46,125,79,.3)}
   .empty{text-align:center;color:var(--muted);padding:46px 20px;font-style:italic;font-family:'Cormorant Garamond',serif;font-size:21px}
+  .row .actions{display:flex;gap:8px;align-items:center;flex:none;flex-wrap:wrap;justify-content:flex-end}
+  .row .undo{background:none;border:0;color:var(--muted);cursor:pointer;font-family:inherit;font-size:13.5px;text-decoration:underline;padding:4px}
+  .row .undo:hover{color:var(--red)}
+  .arrivals-count{font-size:15px;color:var(--muted);margin-bottom:12px}
+  .arrivals-count strong{color:var(--navy)}
+  .link-banner{
+    display:none;align-items:center;gap:12px;background:rgba(46,125,79,.09);
+    border:1px solid rgba(46,125,79,.3);border-radius:6px;padding:12px 16px;margin-bottom:18px;font-size:16px;color:var(--green);
+  }
+  .link-banner.on{display:flex}
+  .link-banner strong{color:var(--navy)}
+  .link-banner .x-link{margin-left:auto;background:none;border:0;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;font-family:inherit}
+  .link-banner .x-link:hover{color:var(--red)}
 
   /* ---------- Log ---------- */
   .log-item{display:flex;gap:14px;padding:13px 4px;border-bottom:1px solid var(--line-soft);font-size:16px}
@@ -225,7 +238,7 @@
     .grid2{grid-template-columns:1fr}
     .child-row .grid-child{grid-template-columns:1fr .6fr;grid-template-rows:auto auto;align-items:end}
     .child-row .grid-child .span2{grid-column:1/-1}
-    .stats-row{gap:8px}
+    .stats-row{gap:8px;grid-template-columns:repeat(2,1fr)}
     .stat .n{font-size:30px}
     .stat .l{font-size:11.5px}
     .topbar .brand .t{display:none}
@@ -291,22 +304,43 @@
   <div class="wrap">
 
     <div class="stats-row">
+      <div class="stat"><div class="n" id="stArrived">0</div><div class="l">Boletas recibidas</div></div>
       <div class="stat"><div class="n g" id="stPresent">0</div><div class="l">Presentes ahora</div></div>
       <div class="stat"><div class="n" id="stTotal">0</div><div class="l">Niños registrados</div></div>
       <div class="stat"><div class="n" id="stOut">0</div><div class="l">Entregados</div></div>
     </div>
 
     <div class="tabs" role="tablist">
-      <button class="tab on" data-panel="pReceive" role="tab">Recibir niños</button>
+      <button class="tab on" data-panel="pArrivals" role="tab">Llegadas <span class="badge" id="tabBadgeArr">0</span></button>
+      <button class="tab" data-panel="pReceive" role="tab">Recibir niños</button>
       <button class="tab" data-panel="pRoster" role="tab">Presentes <span class="badge" id="tabBadge">0</span></button>
       <button class="tab" data-panel="pLog" role="tab">Historial</button>
     </div>
 
+    <!-- ===== Panel: Llegadas (boletas compradas) ===== -->
+    <section class="panel on" id="pArrivals" role="tabpanel">
+      <div class="searchbar">
+        <input type="text" id="arrSearch" placeholder="Buscar por nombre o correo…" />
+        <button class="btn btn-ghost btn-sm" id="btnArrExport" type="button">Exportar llegadas</button>
+      </div>
+      <div class="arrivals-count" id="arrCount"></div>
+      <div class="list" id="arrList"></div>
+      <div class="empty" id="arrEmpty" style="display:none">
+        No aparece en la lista de boletas.<br/>
+        <button class="btn btn-ghost btn-sm" id="btnArrWalkin" type="button" style="margin-top:14px">Registrarla en «Recibir niños»</button>
+      </div>
+    </section>
+
     <!-- ===== Panel: Recibir ===== -->
-    <section class="panel on" id="pReceive" role="tabpanel">
+    <section class="panel" id="pReceive" role="tabpanel">
       <div class="card">
         <h3>Registrar familia y recibir niños</h3>
         <p class="sub">Completa los datos del padre/madre, agrega a cada niño y genera el ticket de recogida.</p>
+
+        <div class="link-banner" id="linkBanner">
+          <span id="linkBannerTx"></span>
+          <button class="x-link" id="btnUnlink" type="button" title="Quitar vínculo con la boleta">&times;</button>
+        </div>
 
         <div class="grid2">
           <div class="field">
@@ -438,14 +472,60 @@
   var TK_KEY = "practicum2026_token";
   var PULL_MS = 20000;
 
+  /* ================= Boletas compradas (hoja de inscripciones) ================= */
+  // Lista de personas que ya compraron su boleta. "adults" = individuos de la
+  // boleta, "kids" = niños según la reserva, "meals" = almuerzos comprados
+  // (columna Comida). El id es estable (mismo en todos los dispositivos)
+  // porque viene incrustado en la página.
+  var ATTENDEES = [
+    { id:"amelia-garcia",       name:"Amelia Garcia (ICC)",       email:"arq.ameliagarcia@yahoo.com",       adults:1, kids:0, meals:1 },
+    { id:"angie-pereyra",       name:"Angie Pereyra",             email:"yeidyngiepk@gmail.com",            adults:1, kids:3, meals:4 },
+    { id:"anni-sanchez",        name:"Anni Sanchez",              email:"annisanchez.srl@gmail.com",        adults:1, kids:0, meals:1 },
+    { id:"anny-chalas",         name:"Anny Chalas",               email:"jc2homeeschool@gmail.com",         adults:2, kids:2, meals:2 },
+    { id:"anny-mirabal",        name:"Anny Mirabal",              email:"mirabalpamela@gmail.com",          adults:2, kids:0, meals:0 },
+    { id:"armando-ng",          name:"Armando Ng",                email:"",                                 adults:1, kids:0, meals:0 },
+    { id:"carolina-joseph",     name:"Carolina Joseph",           email:"carolinajp.vargas@gmail.com",      adults:2, kids:2, meals:2 },
+    { id:"delia-cordero",       name:"Delia Cordero",             email:"",                                 adults:1, kids:0, meals:0 },
+    { id:"dianelis-hernandez",  name:"Dianelis Hernandez",        email:"dianelish4life@gmail.com",         adults:2, kids:4, meals:0 },
+    { id:"eduardo-laucer",      name:"Eduardo Laucer",            email:"eduardo7laucer@gmail.com",         adults:2, kids:0, meals:0 },
+    { id:"euclides-medici",     name:"Euclides Medici",           email:"",                                 adults:1, kids:0, meals:0 },
+    { id:"fray-marte",          name:"Fray Marte",                email:"familiamarteabreau1@gmail.com",    adults:2, kids:3, meals:3 },
+    { id:"gabriela-vasquez",    name:"Gabriela Vasquez",          email:"gabrielavasquez888@gmail.com",     adults:2, kids:2, meals:2 },
+    { id:"gloria-sang",         name:"Gloria Sang",               email:"",                                 adults:2, kids:3, meals:5 },
+    { id:"jared-suarez",        name:"Jared Suarez",              email:"",                                 adults:1, kids:0, meals:0 },
+    { id:"jonathan-almonte",    name:"Jonathan Almonte",          email:"mrjonathan815@gmail.com",          adults:2, kids:1, meals:0 },
+    { id:"jose-martinez",       name:"Jose Martinez",             email:"joaven1994@gmail.com",             adults:1, kids:0, meals:0 },
+    { id:"jose-nunez",          name:"Jose Nuñez",                email:"indhirasantanam@gmail.com",        adults:2, kids:0, meals:2 },
+    { id:"karileydy-terrazas",  name:"Karileydy Terrazas",        email:"",                                 adults:2, kids:1, meals:1 },
+    { id:"katerine-genao",      name:"Katerine Genao",            email:"",                                 adults:2, kids:3, meals:5 },
+    { id:"katihusca-rodriguez", name:"Katihusca Rodriguez",       email:"",                                 adults:2, kids:2, meals:4 },
+    { id:"leiny-giro",          name:"Leiny Giró",                email:"leyni.giro@gmail.com",             adults:1, kids:0, meals:0 },
+    { id:"leslie-arellano",     name:"Leslie Arellano",           email:"",                                 adults:2, kids:1, meals:1 },
+    { id:"marta-rosario",       name:"Marta Rosario",             email:"",                                 adults:1, kids:2, meals:3 },
+    { id:"merari-munoz",        name:"Merari Muñoz",              email:"merarimunoz85@gmail.com",          adults:1, kids:0, meals:0 },
+    { id:"pamela-rivera",       name:"Pamela Rivera",             email:"",                                 adults:1, kids:2, meals:3 },
+    { id:"pamela-santana",      name:"Pamela Santana",            email:"",                                 adults:2, kids:0, meals:0 },
+    { id:"paola-marte",         name:"Paola Marte",               email:"paolamarte19@gmail.com",           adults:2, kids:0, meals:0 },
+    { id:"pedro-rodriguez",     name:"Pedro Antonio Rodríguez",   email:"bethelduran@gmail.com",            adults:2, kids:0, meals:0 },
+    { id:"priamo-rodriguez",    name:"Priamo Rodriguez",          email:"rosaelenadelacruzrivas@gmail.com", adults:2, kids:0, meals:2 },
+    { id:"ramona-morillo",      name:"Ramona Morillo",            email:"r.morillo3108@gmail.com",          adults:2, kids:2, meals:0 },
+    { id:"robin-matos",         name:"Robin Matos",               email:"",                                 adults:2, kids:0, meals:0 },
+    { id:"rosa-cc",             name:"Rosa (CC)",                 email:"",                                 adults:1, kids:0, meals:0 },
+    { id:"suly-encarnacion",    name:"Suly Encarnación",          email:"kprosariot@gmail.com",             adults:1, kids:2, meals:1 }
+  ];
+  function attendeeById(id){ return ATTENDEES.find(function(a){return a.id===id}); }
+
   /* ================= State ================= */
-  // { families:[{id,famNo,pin,parent,phone,auth,children:[{id,name,age,notes}]}], log:[{id,ts,type,childId,famId,vol,who,method,note}] }
+  // { families:[{id,famNo,pin,parent,phone,auth,attendeeId?,children:[{id,name,age,notes}]}],
+  //   log:[{id,ts,type,childId,famId,vol,who,method,note}],
+  //   arrivals:[{id,ts,attendeeId,type:"in"|"cancel"|"meal"|"meal-cancel",vol}] }  (append-only)
   var state = load();
   function load(){
-    var s = { families:[], log:[] };
+    var s = { families:[], log:[], arrivals:[] };
     try{ var raw = localStorage.getItem(LS_KEY); if(raw) s = JSON.parse(raw); }catch(e){}
-    // Migración: entradas de bitácora previas sin id
+    // Migración: entradas de bitácora previas sin id / estados sin llegadas
     (s.log||[]).forEach(function(l){ if(!l.id) l.id = uid(); });
+    if(!s.arrivals) s.arrivals = [];
     return s;
   }
   function saveLocal(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
@@ -463,7 +543,7 @@
     else if(status==="err"){ el.textContent="● Sin conexión"; el.style.color="#E8A48C"; }
     else { el.textContent="● Modo local"; el.style.color="#C9BBA6"; }
   }
-  // Igual que la unión del servidor: familias inmutables + bitácora append-only
+  // Igual que la unión del servidor: familias inmutables + bitácoras append-only
   function mergeStates(base, incoming){
     var famIds={}; base.families.forEach(function(f){famIds[f.id]=1});
     var families = base.families.concat((incoming.families||[]).filter(function(f){return f&&f.id&&!famIds[f.id]}));
@@ -471,10 +551,14 @@
     var logIds={}; base.log.forEach(function(l){logIds[l.id]=1});
     var log = base.log.concat((incoming.log||[]).filter(function(l){return l&&l.id&&!logIds[l.id]}));
     log.sort(function(x,y){return String(x.ts||"").localeCompare(String(y.ts||""))});
-    return { families:families, log:log };
+    var baseArr = base.arrivals||[];
+    var arrIds={}; baseArr.forEach(function(a){arrIds[a.id]=1});
+    var arrivals = baseArr.concat((incoming.arrivals||[]).filter(function(a){return a&&a.id&&!arrIds[a.id]}));
+    arrivals.sort(function(x,y){return String(x.ts||"").localeCompare(String(y.ts||""))});
+    return { families:families, log:log, arrivals:arrivals };
   }
   function applyServer(server){
-    var merged = mergeStates(state, server||{families:[],log:[]});
+    var merged = mergeStates(state, server||{families:[],log:[],arrivals:[]});
     if(JSON.stringify(merged)!==JSON.stringify(state)){
       state = merged; saveLocal(); renderAll();
     }
@@ -525,6 +609,34 @@
     var out=[];
     state.families.forEach(function(f){ f.children.forEach(function(c){ out.push({child:c,fam:f}); }); });
     return out;
+  }
+  // Último registro de una boleta por grupo de tipos (llegadas o almuerzos)
+  function lastByTypes(attendeeId, types){
+    var arr = state.arrivals||[];
+    for(var i=arr.length-1;i>=0;i--){
+      if(arr[i].attendeeId===attendeeId && types.indexOf(arr[i].type)>=0) return arr[i];
+    }
+    return null;
+  }
+  // "in" = recibida, "cancel" = deshecha
+  function lastArrival(attendeeId){ return lastByTypes(attendeeId, ["in","cancel"]); }
+  function isArrived(attendeeId){
+    var a = lastArrival(attendeeId);
+    return !!(a && a.type==="in");
+  }
+  // "meal" = almuerzos entregados, "meal-cancel" = deshecho
+  function lastMeal(attendeeId){ return lastByTypes(attendeeId, ["meal","meal-cancel"]); }
+  function mealsDelivered(attendeeId){
+    var m = lastMeal(attendeeId);
+    return !!(m && m.type==="meal");
+  }
+  function famForAttendee(attendeeId){
+    return state.families.find(function(f){return f.attendeeId===attendeeId});
+  }
+  function norm(s){
+    s = String(s||"").toLowerCase();
+    try{ s = s.normalize("NFD").replace(/[\u0300-\u036f]/g,""); }catch(e){}
+    return s;
   }
   function uid(){ return Math.random().toString(36).slice(2,10); }
   function now(){ return new Date().toISOString(); }
@@ -604,13 +716,151 @@
 
   /* ================= Tabs ================= */
   var tabs=document.querySelectorAll(".tab");
+  function selectTab(panelId){
+    tabs.forEach(function(x){x.classList.toggle("on", x.getAttribute("data-panel")===panelId)});
+    document.querySelectorAll(".panel").forEach(function(p){p.classList.toggle("on", p.id===panelId)});
+  }
   tabs.forEach(function(t){
-    t.addEventListener("click",function(){
-      tabs.forEach(function(x){x.classList.remove("on")});
-      document.querySelectorAll(".panel").forEach(function(p){p.classList.remove("on")});
-      t.classList.add("on");
-      $(t.getAttribute("data-panel")).classList.add("on");
+    t.addEventListener("click",function(){ selectTab(t.getAttribute("data-panel")); });
+  });
+
+  /* ================= Llegadas (boletas) ================= */
+  var pendingAttendee = null; // boleta vinculada al formulario "Recibir niños"
+
+  function renderArrivals(){
+    var q=norm($("arrSearch").value.trim());
+    var list=$("arrList"); list.innerHTML="";
+    var items = ATTENDEES.slice().sort(function(a,b){return a.name.localeCompare(b.name,"es")});
+    if(q){ items = items.filter(function(a){ return (norm(a.name)+" "+norm(a.email)).indexOf(q)>=0; }); }
+
+    var arrived = ATTENDEES.filter(function(a){return isArrived(a.id)}).length;
+    var mealsTotal = ATTENDEES.reduce(function(s,a){return s+(a.meals||0)},0);
+    var mealsOut = ATTENDEES.reduce(function(s,a){return s+(mealsDelivered(a.id)?(a.meals||0):0)},0);
+    $("arrCount").innerHTML = "<strong>"+arrived+"</strong> de <strong>"+ATTENDEES.length+"</strong> boletas recibidas · <strong>"+mealsOut+"</strong> de <strong>"+mealsTotal+"</strong> almuerzos entregados";
+    $("arrEmpty").style.display = items.length? "none":"block";
+
+    items.forEach(function(a){
+      var arr = lastArrival(a.id);
+      var inNow = !!(arr && arr.type==="in");
+      var fam = famForAttendee(a.id);
+      var meal = lastMeal(a.id);
+      var mealOk = !!(meal && meal.type==="meal");
+      var div=document.createElement("div");
+      div.className = "row"+(inNow?"":" out");
+      var metaBits=[ a.adults+(a.adults===1?" adulto":" adultos") ];
+      if(a.kids) metaBits.push(a.kids+(a.kids===1?" niño":" niños")+" según reserva");
+      if(a.meals) metaBits.push(a.meals+(a.meals===1?" almuerzo":" almuerzos"));
+      if(a.email) metaBits.push(a.email);
+      var chips="";
+      if(inNow) chips+='<span class="chip ok">✓ Recibida '+fmtTime(arr.ts)+'</span>';
+      if(fam) chips+='<span class="chip code">F-'+("0"+fam.famNo).slice(-2)+'</span>';
+      if(mealOk) chips+='<span class="chip ok">✓ '+a.meals+(a.meals===1?' almuerzo':' almuerzos')+' '+fmtTime(meal.ts)+'</span>';
+      div.innerHTML =
+        '<div class="avatar">'+esc(initials(a.name))+'</div>'+
+        '<div class="info">'+
+          '<div class="nm">'+esc(a.name)+chips+'</div>'+
+          '<div class="meta">'+esc(metaBits.join(" · "))+'</div>'+
+        '</div>'+
+        '<div class="actions"></div>';
+      var actions=div.querySelector(".actions");
+
+      if(!inNow){
+        var btn=document.createElement("button");
+        btn.className="btn btn-primary btn-sm"; btn.type="button"; btn.textContent="Recibir";
+        btn.addEventListener("click",function(){ receiveAttendee(a); });
+        actions.appendChild(btn);
+      } else {
+        if(a.kids>0 && !fam){
+          var btnKids=document.createElement("button");
+          btnKids.className="btn btn-ghost btn-sm"; btnKids.type="button"; btnKids.textContent="Registrar niños";
+          btnKids.addEventListener("click",function(){ startKidsCheckin(a); });
+          actions.appendChild(btnKids);
+        }
+        if(a.meals>0 && !mealOk){
+          var btnMeal=document.createElement("button");
+          btnMeal.className="btn btn-ghost btn-sm"; btnMeal.type="button";
+          btnMeal.textContent="Entregar "+a.meals+(a.meals===1?" almuerzo":" almuerzos");
+          btnMeal.addEventListener("click",function(){
+            state.arrivals.push({ id:uid(), ts:now(), attendeeId:a.id, type:"meal", vol:currentVol() });
+            save(); renderAll();
+          });
+          actions.appendChild(btnMeal);
+        }
+        if(a.meals>0 && mealOk){
+          var undoMeal=document.createElement("button");
+          undoMeal.className="undo"; undoMeal.type="button"; undoMeal.textContent="deshacer almuerzos";
+          undoMeal.title="Marcar los almuerzos como no entregados";
+          undoMeal.addEventListener("click",function(){
+            state.arrivals.push({ id:uid(), ts:now(), attendeeId:a.id, type:"meal-cancel", vol:currentVol() });
+            save(); renderAll();
+          });
+          actions.appendChild(undoMeal);
+        }
+        var undo=document.createElement("button");
+        undo.className="undo"; undo.type="button"; undo.textContent="deshacer";
+        undo.title="Marcar la llegada como no recibida";
+        undo.addEventListener("click",function(){
+          state.arrivals.push({ id:uid(), ts:now(), attendeeId:a.id, type:"cancel", vol:currentVol() });
+          save(); renderAll();
+        });
+        actions.appendChild(undo);
+      }
+      list.appendChild(div);
     });
+  }
+
+  function receiveAttendee(a){
+    state.arrivals.push({ id:uid(), ts:now(), attendeeId:a.id, type:"in", vol:currentVol() });
+    save(); renderAll();
+    // Si la boleta incluye niños y aún no se registraron, pasar directo al formulario
+    if(a.kids>0 && !famForAttendee(a.id)) startKidsCheckin(a);
+  }
+
+  function startKidsCheckin(a){
+    pendingAttendee = a;
+    $("fParent").value = a.name;
+    $("fPhone").value=""; $("fAuth").value="";
+    childRows.innerHTML="";
+    for(var i=0;i<Math.max(1,a.kids);i++) addChildRow();
+    $("linkBannerTx").innerHTML = 'Boleta de <strong>'+esc(a.name)+'</strong> — '+a.kids+(a.kids===1?' niño':' niños')+' según la reserva.';
+    $("linkBanner").classList.add("on");
+    selectTab("pReceive");
+    var first=childRows.querySelector(".c-name");
+    if(first) setTimeout(function(){ first.focus(); },50);
+  }
+  function clearPendingAttendee(){
+    pendingAttendee=null;
+    $("linkBanner").classList.remove("on");
+  }
+  $("btnUnlink").addEventListener("click", clearPendingAttendee);
+  $("arrSearch").addEventListener("input", renderArrivals);
+  $("btnArrWalkin").addEventListener("click", function(){
+    var q=$("arrSearch").value.trim();
+    clearPendingAttendee();
+    if(q) $("fParent").value=q;
+    selectTab("pReceive");
+  });
+
+  $("btnArrExport").addEventListener("click", function(){
+    var rows=[["Nombre","Correo","Adultos","Niños (reserva)","Almuerzos","Estado","Hora llegada","Recibió","Almuerzos entregados","Hora almuerzos","Entregó almuerzos"]];
+    ATTENDEES.slice().sort(function(a,b){return a.name.localeCompare(b.name,"es")}).forEach(function(a){
+      var arr=lastArrival(a.id);
+      var inNow=!!(arr && arr.type==="in");
+      var meal=lastMeal(a.id);
+      var mealOk=!!(meal && meal.type==="meal");
+      rows.push([ a.name, a.email||"", a.adults, a.kids||0, a.meals||0,
+        inNow?"Recibida":"Pendiente",
+        inNow?new Date(arr.ts).toLocaleString("es-DO"):"",
+        inNow?(arr.vol||""):"",
+        mealOk?"Sí":"No",
+        mealOk?new Date(meal.ts).toLocaleString("es-DO"):"",
+        mealOk?(meal.vol||""):"" ]);
+    });
+    var csv = rows.map(function(r){ return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(","); }).join("\n");
+    var aEl=document.createElement("a");
+    aEl.href=URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"}));
+    aEl.download="llegadas-practicum2026.csv";
+    aEl.click();
   });
 
   /* ================= Form: niños dinámicos ================= */
@@ -653,6 +903,13 @@
     var famNo = state.families.reduce(function(m,f){return Math.max(m,f.famNo||0)},0)+1;
     var pin = String(Math.floor(1000+Math.random()*9000));
     var fam = { id:uid(), famNo:famNo, pin:pin, parent:parent, phone:phone, auth:auth, children:children, createdAt:now() };
+    if(pendingAttendee){
+      fam.attendeeId = pendingAttendee.id;
+      // Si la boleta se registró directo desde el formulario, marcar la llegada también
+      if(!isArrived(pendingAttendee.id)){
+        state.arrivals.push({ id:uid(), ts:now(), attendeeId:pendingAttendee.id, type:"in", vol:currentVol() });
+      }
+    }
     state.families.push(fam);
     children.forEach(function(c){
       state.log.push({ id:uid(), ts:now(), type:"in", childId:c.id, famId:fam.id, vol:currentVol(), who:parent, method:"registro", note:"" });
@@ -660,6 +917,7 @@
     save();
 
     // limpiar formulario
+    clearPendingAttendee();
     $("fParent").value=""; $("fPhone").value=""; $("fAuth").value="";
     childRows.innerHTML=""; addChildRow();
 
@@ -865,10 +1123,14 @@
     var all=allChildren();
     var present=all.filter(function(x){return childStatus(x.child.id)==="in"}).length;
     var out=all.filter(function(x){return childStatus(x.child.id)==="out"}).length;
+    var arrived=ATTENDEES.filter(function(a){return isArrived(a.id)}).length;
+    $("stArrived").textContent=arrived+"/"+ATTENDEES.length;
     $("stPresent").textContent=present;
     $("stTotal").textContent=all.length;
     $("stOut").textContent=out;
     $("tabBadge").textContent=present;
+    $("tabBadgeArr").textContent=arrived;
+    renderArrivals();
     renderRoster();
     renderLog();
   }

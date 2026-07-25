@@ -1,18 +1,18 @@
 import crypto from "node:crypto";
 import { getStore } from "@netlify/blobs";
 
-// Estado compartido del Área Infantil (familias + bitácora) en Netlify Blobs,
-// para operar desde varios dispositivos a la vez.
+// Estado compartido del Área Infantil (familias + bitácora + llegadas) en
+// Netlify Blobs, para operar desde varios dispositivos a la vez.
 // GET  → devuelve el estado actual.
 // POST → une el estado enviado con el guardado (unión por id: las familias son
-//        inmutables y la bitácora es append-only, así que la unión no pierde
-//        ni sobrescribe nada) y devuelve el resultado.
+//        inmutables y las bitácoras son append-only, así que la unión no
+//        pierde ni sobrescribe nada) y devuelve el resultado.
 const TOKEN_SEED = "practicum-ninos-2026";
 const KEY = "state";
+const DEFAULT_PASSWORD = "practicum2026";
 
 function authorized(req) {
-  const pass = process.env.NINOS_PASSWORD;
-  if (!pass) return false;
+  const pass = process.env.NINOS_PASSWORD || DEFAULT_PASSWORD;
   const given = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
   const expected = crypto.createHmac("sha256", pass).update(TOKEN_SEED).digest("hex");
   const a = crypto.createHash("sha256").update(given).digest();
@@ -31,7 +31,13 @@ export function mergeStates(base, incoming) {
     (incoming.log || []).filter((l) => l && l.id && !logIds.has(l.id))
   );
   log.sort((x, y) => String(x.ts || "").localeCompare(String(y.ts || "")));
-  return { families, log };
+  const baseArrivals = base.arrivals || [];
+  const arrIds = new Set(baseArrivals.map((a) => a.id));
+  const arrivals = baseArrivals.concat(
+    (incoming.arrivals || []).filter((a) => a && a.id && !arrIds.has(a.id))
+  );
+  arrivals.sort((x, y) => String(x.ts || "").localeCompare(String(y.ts || "")));
+  return { families, log, arrivals };
 }
 
 export default async (req) => {
@@ -39,7 +45,7 @@ export default async (req) => {
     return Response.json({ error: "No autorizado" }, { status: 401 });
   }
   const store = getStore("ninos");
-  const current = (await store.get(KEY, { type: "json" })) || { families: [], log: [] };
+  const current = (await store.get(KEY, { type: "json" })) || { families: [], log: [], arrivals: [] };
 
   if (req.method === "GET") {
     return Response.json(current);

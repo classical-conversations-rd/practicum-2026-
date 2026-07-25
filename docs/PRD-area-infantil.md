@@ -66,6 +66,17 @@ Fuentes principales: documentación de soporte de ChurchSuite (Getting started w
 
 ## 5. Flujos principales
 
+### 5.0 Llegadas (check-in de boletas)
+
+1. La pestaña **«Llegadas»** (vista inicial) lista las **boletas ya compradas** (hoja de inscripciones incrustada en la página: nombre, correo, adultos, niños y almuerzos según la reserva), ordenadas alfabéticamente y con búsqueda por nombre o correo.
+2. Al llegar una familia, el voluntario la busca y pulsa **«Recibir»**: la boleta queda marcada «✓ Recibida» con hora y voluntario (visible en todos los dispositivos).
+   - **Si la boleta incluye niños**, la página salta directo a «Recibir niños» con el nombre del padre pre-llenado y una fila por niño según la reserva; al generar el ticket, la familia queda **vinculada a la boleta** (chip `F-XX` en la fila de llegadas). Si los niños no vienen en ese momento, el botón «Registrar niños» queda disponible en la fila.
+   - **Si no incluye niños**, no hay nada más que hacer: la llegada queda registrada.
+3. **Almuerzos:** si la boleta incluye comida, tras recibirla aparece el botón **«Entregar N almuerzos»**. Al pulsarlo queda el chip «✓ N almuerzos» con hora y voluntario — así la mesa de comida verifica que nadie retire dos veces. El contador de la pestaña muestra «X de 42 almuerzos entregados».
+4. Un toque en «deshacer» (o «deshacer almuerzos») revierte una marca hecha por error (se registra como movimiento nuevo, no se borra nada).
+5. **Walk-ins** (no aparecen en la lista): botón directo a «Recibir niños», que sigue funcionando igual que antes.
+6. **«Exportar llegadas»** descarga el CSV de asistencia (recibida/pendiente, hora, voluntario, almuerzos entregados).
+
 ### 5.1 Recepción (check-in)
 
 1. El voluntario inicia sesión (nombre + contraseña del equipo).
@@ -126,8 +137,15 @@ Almacenado como JSON (v1: `localStorage`, clave `practicum2026_ninos_v1`):
     id, famNo,            // secuencial: F-01, F-02…
     pin,                  // 4 dígitos aleatorios — el código de recogida
     parent, phone, auth,  // tutor principal, WhatsApp, autorizados (texto)
+    attendeeId,           // opcional: boleta comprada a la que pertenece
     children: [{ id, name, age, notes }],
     createdAt
+  }],
+  arrivals: [{            // llegadas de boletas: también append-only
+    id, ts,
+    attendeeId,           // id estable de la boleta (lista incrustada en la página)
+    type,                 // "in" (recibida) | "cancel" (deshecha)
+    vol
   }],
   log: [{                 // bitácora "append-only": nunca se edita ni borra
     ts, type,             // "in" | "out"
@@ -144,7 +162,7 @@ El estado de un niño (Presente/Entregado) **se deriva del último movimiento de
 
 ## 8. Seguridad
 
-- **En producción (Netlify):** la contraseña se valida en el servidor (`ninos-login.mjs`) contra la variable de entorno **`NINOS_PASSWORD`**, con comparación en tiempo constante. El servidor devuelve un token (HMAC derivado de la contraseña) que autoriza las llamadas al estado compartido (`ninos-state.mjs`). La contraseña real nunca se guarda en el navegador.
+- **En producción (Netlify):** la contraseña se valida en el servidor (`ninos-login.mjs`) con comparación en tiempo constante. Funciona **sin configuración**: usa la contraseña del equipo incluida por defecto; la variable de entorno **`NINOS_PASSWORD`** (opcional) la reemplaza si se quiere cambiar sin re-desplegar. El servidor devuelve un token (HMAC derivado de la contraseña) que autoriza las llamadas al estado compartido (`ninos-state.mjs`). La contraseña real nunca se guarda en el navegador.
 - **Modo local (fallback):** si las funciones no responden (desarrollo local, sitio estático), la página cae a la comparación con hash SHA-256 en el navegador (contraseña `practicum2026`) y los datos viven solo en ese dispositivo. El indicador de la barra superior muestra el modo activo: «Sincronizado», «Sin conexión» o «Modo local».
 - `noindex, nofollow` para no aparecer en buscadores; la URL no se enlaza desde la página pública.
 - Los datos de los niños solo viajan entre el navegador y las funciones del propio sitio, salvo el ticket enviado por WhatsApp al propio padre.
@@ -158,9 +176,11 @@ El estado de un niño (Presente/Entregado) **se deriva del último movimiento de
 2. **Estado compartido multi-dispositivo:** `netlify/functions/ninos-state.mjs` guarda familias y bitácora en **Netlify Blobs** (store `ninos`). Cada dispositivo empuja sus cambios (con reintento implícito: siempre envía su estado completo) y consulta cada 20 s y al volver a la pestaña. La fusión es una **unión por id** — las familias son inmutables y la bitácora es append-only, así que ningún dispositivo puede sobrescribir ni borrar lo de otro, y una escritura perdida se recupera en el siguiente ciclo.
 3. `localStorage` pasa a ser la caché local/offline; si se cae el internet, la mesa sigue operando y sincroniza al volver.
 
-**Configuración requerida en Netlify:** definir la variable de entorno **`NINOS_PASSWORD`** (Site settings → Environment variables) con la contraseña real del equipo antes del evento. Sin ella, las funciones responden error y la página queda en modo local.
+**Configuración en Netlify:** ninguna obligatoria — las funciones usan la contraseña del equipo por defecto. Definir **`NINOS_PASSWORD`** (Site settings → Environment variables) solo si se quiere usar otra contraseña.
 
-**Fase 3 — Opcional futuro:** QR en el ticket (escaneo en vez de digitar el PIN) y pre-registro vinculado a la compra en Stripe (metadata `kids`).
+**Fase 3 — Llegadas de boletas (hecha):** la lista de compradores de la hoja de inscripciones va **incrustada en la página** (constante `ATTENDEES`, con id estable por boleta). La pestaña «Llegadas» permite recibir a cada familia al llegar, encadena con el registro de niños cuando la reserva los incluye, y guarda las llegadas en el mismo estado compartido (`arrivals`, append-only, fusión por id igual que la bitácora). Para actualizar la lista antes del evento, se regenera `ATTENDEES` desde la hoja de cálculo y se despliega.
+
+**Fase 4 — Opcional futuro:** QR en el ticket (escaneo en vez de digitar el PIN) y pre-registro vinculado a la compra en Stripe (metadata `kids`).
 
 > Nota de la fusión multi-dispositivo: dos mesas registrando a la vez pueden emitir el mismo número de familia (`F-07`) con PIN distinto; el código completo (familia + PIN) sigue siendo único y la verificación de entrega no se ve afectada.
 
@@ -171,7 +191,7 @@ El estado de un niño (Presente/Entregado) **se deriva del último movimiento de
 | Se borra el `localStorage` (limpiar historial, modo incógnito) | El estado vive también en Netlify Blobs: al volver a entrar se descarga completo. Exportar CSV a media jornada como respaldo adicional |
 | Padre sin teléfono/foto del ticket | El código cabe en un papel escrito a mano; fallback de cédula siempre disponible |
 | Se cae el internet del local | La página sigue operando con la caché local y muestra «Sin conexión»; sincroniza al volver la señal |
-| Olvidar configurar `NINOS_PASSWORD` en Netlify | La página cae a modo local (un solo dispositivo) — verificar el indicador «Sincronizado» al montar la mesa |
+| Las funciones de Netlify no responden | La página cae a modo local (un solo dispositivo) — verificar el indicador «Sincronizado» al montar la mesa |
 | Contraseña filtrada | Es solo la primera barrera; la entrega física siempre exige además el PIN del ticket o cédula |
 
 ## 11. Métricas de éxito (día del evento)
